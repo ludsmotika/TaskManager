@@ -1,24 +1,2 @@
-﻿  CollaborationTask.cpp
-  ProgramEngine.cpp
-  Session.cpp
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(31,23): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(37,52): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(41,59): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(59,23): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(60,29): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(70,23): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(70,64): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(75,60): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-  TaskManager.cpp
-  User.cpp
-  UsersCollection.cpp
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Vector.hpp(120,13): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Vector.hpp(119,1): message : while compiling class template member function 'void Vector<User>::push_back(const T &)'
-          with
-          [
-              T=User
-          ]
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\UsersCollection.cpp(36,23): message : see the first reference to 'Vector<User>::push_back' in 'UsersCollection::addUser'
-C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\UsersCollection.h(19,15): message : see reference to class template instantiation 'Vector<User>' being compiled
-  Generating Code...
+﻿  TasksCollection.cpp
   TaskManager.vcxproj -> C:\Users\danie\source\repos\TaskManager\TaskManager\x64\Debug\TaskManager.exe

@@ -12,18 +12,25 @@ public:
 
     void registerUser(MyString username, MyString password);
     void loginUser(MyString username, MyString password);
+    void logout();
+    void updateTaskName(unsigned taskId, MyString newName);
+    void startTaskById(unsigned taskId);
+    void updateTaskDescription(unsigned taskId, MyString newDescription);
 
     void addTask(MyString name, time_t dueDate, MyString description);
 
+    void closeSession();
+
     Session(const Session&) = delete;
     Session& operator=(const Session&) = delete;
+
+    bool isThereALoggedInUser() const;
 
 private:
     Session();
 
     UsersCollection usersCollection;
     TasksCollection tasksCollection;
-    Dashboard dashboard;
     int currentUserIndex = -1;
 
     MyString usersFilename;
@@ -32,5 +39,5 @@ private:
 
     bool initialized;
 
-    void saveUserToFile(const User& user) const;
+    void initDashBoardForCurrentUser();
 };

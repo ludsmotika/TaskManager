@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CollaborationTask.cpp" />
+    <ClCompile Include="Dashboard.cpp" />
     <ClCompile Include="GlobalFunctions.cpp" />
     <ClCompile Include="MyString.cpp" />
     <ClCompile Include="ProgramEngine.cpp" />
@@ -148,12 +149,14 @@
     <ClInclude Include="Optional.hpp" />
     <ClInclude Include="ProgramEngine.h" />
     <ClInclude Include="Session.h" />
+    <ClInclude Include="SharedPtr.hpp" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TasksCollection.h" />
     <ClInclude Include="TaskStatus.h" />
     <ClInclude Include="User.h" />
     <ClInclude Include="UsersCollection.h" />
     <ClInclude Include="Vector.hpp" />
+    <ClInclude Include="WeakPtr.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

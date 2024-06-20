@@ -2,7 +2,7 @@
 #include "User.h"
 #include "Optional.hpp"
 
-class CollaborationTask : Task 
+class CollaborationTask : public Task 
 {
 public:
 	void print() const override;

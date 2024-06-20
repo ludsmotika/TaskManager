@@ -1,5 +1,6 @@
 #pragma once
 #include "Task.h"
+#include "SharedPtr.hpp"
 
 class TasksCollection
 {
@@ -16,15 +17,19 @@ public:
 
 	void readTasksFromFile(const char* filename);
 
+	void addTask(Task* task);
 	void addTask(const Task& task);
 
 	size_t getTasksCount() const;
 
-	const Task& operator[] (unsigned index) const;
-	Task* operator[] (unsigned index);
+	SharedPtr<Task> getTaskById(unsigned id);
 
+	const Task& operator[] (unsigned index) const;
+	SharedPtr<Task> operator[] (unsigned index);
+
+	void saveAllTasksToFile(const char* filename);
 private:
-	Task** tasks;
+	SharedPtr<Task>* tasks;
 	size_t tasksCount;
 	size_t capacity;
 
@@ -32,4 +37,6 @@ private:
 	void copyFrom(const TasksCollection& other);
 	void moveFrom(TasksCollection&& other);
 	void resize();
+
+	void saveTaskToFile(std::ofstream& os, const Task& task);
 };

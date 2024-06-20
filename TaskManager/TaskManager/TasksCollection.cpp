@@ -1,5 +1,6 @@
 #include "TasksCollection.h"
 #include "GlobalFunctions.h"
+#include <fstream>
 
 //TODO see if this constructor will work right after thinking about how to save the tasks
 
@@ -7,7 +8,7 @@ TasksCollection::TasksCollection()
 {
 	capacity = 8;
 	tasksCount = 0;
-	tasks = new Task * [capacity];
+	tasks = new SharedPtr<Task>[capacity];
 
 	//fill the collection
 }
@@ -50,15 +51,55 @@ TasksCollection::~TasksCollection()
 
 void TasksCollection::readTasksFromFile(const char* filename)
 {
+	if (!filename)
+		throw std::invalid_argument("Nullptr passed as an argument");
 
+	std::ifstream is(filename, std::ios::binary | std::ios::in);
+
+	if (!is.is_open())
+		throw std::invalid_argument("Cannot open file for reading!");
+
+	while (true)
+	{
+		unsigned id;
+		is.read((char*)&id, sizeof(unsigned));
+
+		size_t taskNameLength;
+		is.read((char*)&taskNameLength, sizeof(size_t));
+
+		char* taskName = new char[taskNameLength];
+		is.read(taskName, sizeof(char) * taskNameLength);
+
+		bool isThereADueDate
+
+		time_t dueDate = {};
+		is.read((char*)&dueDate, sizeof(time_t));
+
+		TaskStatus status;
+		is.read((char*)&status, sizeof(TaskStatus));
+
+		size_t taskDescriptionLength;
+		is.read((char*)&taskDescriptionLength, sizeof(size_t));
+
+		char* description = new char[taskDescriptionLength];
+		is.read(description, sizeof(char) * taskDescriptionLength);
+
+		if (is.eof()) break;
+
+		MyString parsedTaskName(taskName);
+		MyString parsedTaskDescription(description);
+
+		addTask(new Task(id, parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength)));
+
+		delete[] taskName;
+		delete[] description;
+	}
 }
 
 
 void TasksCollection::addTask(const Task& task)
 {
-	if (tasksCount == capacity)
-		resize();
-	tasks[tasksCount++] = task.clone();
+	addTask(task.clone());
 }
 
 size_t TasksCollection::getTasksCount() const
@@ -71,21 +112,22 @@ const Task& TasksCollection::operator[] (unsigned index) const
 	return *tasks[index];
 }
 
-Task* TasksCollection::operator[] (unsigned index)
+SharedPtr<Task> TasksCollection::operator[] (unsigned index)
 {
 	return tasks[index];
 }
 
 void TasksCollection::free()
 {
-	for (size_t i = 0; i < tasksCount; i++)
-		delete tasks[i];
+	//TODO think about how to delete the tasks collection
+	/*for (size_t i = 0; i < tasksCount; i++)
+		delete &tasks[i];*/
 	delete[] tasks;
 }
 
 void TasksCollection::copyFrom(const TasksCollection& other)
 {
-	tasks = new Task * [other.capacity];
+	tasks = new SharedPtr<Task>[other.capacity];
 	tasksCount = other.tasksCount;
 	capacity = other.capacity;
 
@@ -110,9 +152,74 @@ void TasksCollection::moveFrom(TasksCollection&& other)
 
 void TasksCollection::resize()
 {
-	Task** newCollection = new Task* [capacity *= 2];
+	SharedPtr<Task>* newCollection = new SharedPtr<Task>[capacity *= 2];
 	for (size_t i = 0; i < tasksCount; i++)
 		newCollection[i] = tasks[i];
 	delete[] tasks;
 	tasks = newCollection;
+}
+
+SharedPtr<Task> TasksCollection::getTaskById(unsigned id)
+{
+	for (size_t i = 0; i < tasksCount; i++)
+	{
+		if (tasks[i]->getId() == id)
+			return tasks[i];
+	}
+
+	return nullptr;
+}
+
+void TasksCollection::saveAllTasksToFile(const char* filename)
+{
+	if (!filename)
+		throw std::invalid_argument("Nullptr passed as a parameter!");
+
+	std::ofstream os(filename, std::ios::out | std::ios::binary);
+
+	if (!os.is_open())
+		throw std::invalid_argument("Cannot open file for reading!");
+
+	for (size_t i = 0; i < tasksCount; i++)
+		saveTaskToFile(os, *tasks[i]);
+}
+
+
+void TasksCollection::addTask(Task* task)
+{
+	if (tasksCount == capacity)
+		resize();
+	tasks[tasksCount++] = task;
+}
+
+void TasksCollection::saveTaskToFile(std::ofstream& os, const Task& task)
+{
+	unsigned taskId = task.getId();
+	os.write((const char*)&taskId, sizeof(unsigned));
+
+	size_t taskNameLength = task.getName().getSize();
+	os.write((const char*)&taskNameLength, sizeof(size_t));
+	os.write(task.getName().c_str(), sizeof(char) * task.getName().getSize());
+
+
+	bool isThereADueDateForCurrentTask = true;
+
+	try
+	{
+		time_t time = task.getDueDate();
+		os.write((const char*)&isThereADueDateForCurrentTask, sizeof(bool));
+		os.write((const char*)&time, sizeof(time_t));
+	}
+	catch (const std::runtime_error& e)
+	{
+		isThereADueDateForCurrentTask = false;
+		os.write((const char*)&isThereADueDateForCurrentTask, sizeof(bool));
+	}
+
+	TaskStatus status = task.getStatus();
+	os.write((const char*)&status, sizeof(TaskStatus));
+
+	size_t taskDescriptionLength = task.getDescription().getSize();
+	os.write((const char*)&taskDescriptionLength, sizeof(size_t));
+	os.write(task.getDescription().c_str(), sizeof(char) * task.getDescription().getSize());
 }
