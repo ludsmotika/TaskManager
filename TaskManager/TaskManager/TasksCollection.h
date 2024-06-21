@@ -22,10 +22,13 @@ public:
 
 	size_t getTasksCount() const;
 
-	SharedPtr<Task> getTaskById(unsigned id);
+	SharedPtr<Task> getTaskById(unsigned id) const;
+	unsigned getMaxTaskId() const;
 
 	const Task& operator[] (unsigned index) const;
 	SharedPtr<Task> operator[] (unsigned index);
+
+	void removeTaskByIndex(unsigned index);
 
 	void saveAllTasksToFile(const char* filename);
 private:

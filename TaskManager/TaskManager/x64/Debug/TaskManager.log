@@ -1,2 +1,23 @@
-﻿  TasksCollection.cpp
+﻿  Session.cpp
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(38,23): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(44,53): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(46,59): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(53,23): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(53,72): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(55,29): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(72,44): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(72,107): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(93,44): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(93,107): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(110,16): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(125,44): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(127,41): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(143,45): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(144,30): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(146,32): warning C4101: 'e': unreferenced local variable
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(157,40): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(170,32): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(172,29): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(223,24): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\danie\source\repos\TaskManager\TaskManager\TaskManager\Session.cpp(225,39): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
   TaskManager.vcxproj -> C:\Users\danie\source\repos\TaskManager\TaskManager\x64\Debug\TaskManager.exe

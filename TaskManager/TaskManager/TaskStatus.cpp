@@ -3,13 +3,13 @@
 std::ostream& operator<<(std::ostream& os, TaskStatus status) {
     switch (status) {
     case TaskStatus::ON_HOLD:
-        os << "ONHOLD";
+        os << "ON_HOLD";
         break;
     case TaskStatus::IN_PROCESS:
-        os << "FINISHED";
+        os << "IN_PROCESS";
         break;
     case TaskStatus::DONE:
-        os << "OVERDUE";
+        os << "DONE";
         break;
     case TaskStatus::OVERDUE:
         os << "OVERDUE";

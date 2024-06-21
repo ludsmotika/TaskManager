@@ -14,10 +14,23 @@ public:
     void loginUser(MyString username, MyString password);
     void logout();
     void updateTaskName(unsigned taskId, MyString newName);
-    void startTaskById(unsigned taskId);
     void updateTaskDescription(unsigned taskId, MyString newDescription);
 
+    void startTaskById(unsigned taskId);
+    void finishTask(unsigned taskId);
+
     void addTask(MyString name, time_t dueDate, MyString description);
+    void addTask(MyString taskName, MyString description);
+    void deleteTask(unsigned taskId);
+
+    void getTask(unsigned taskId) const;
+    void getTask(MyString taskName) const;
+
+    void listTasks(time_t dueDate) const;
+    void listAllTasks() const;
+    void listAllCompletedTasks() const;
+
+
 
     void closeSession();
 

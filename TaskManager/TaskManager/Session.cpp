@@ -1,5 +1,9 @@
 #include "Session.h"
 #include <fstream>
+#include <sstream>
+#include <iostream>
+#include <iomanip>
+
 
 Session::Session() : initialized(false) {}
 
@@ -17,8 +21,8 @@ void Session::init(const char* usersFilename, const char* tasksFilename, const c
 		this->tasksFilename = tasksFilename;
 		this->collaborationsFilename = collaborationsFilename;
 
-		tasksCollection.readTasksFromFile(tasksFilename);
-		usersCollection.readUsersFromFile(usersFilename, tasksCollection);
+		//tasksCollection.readTasksFromFile(tasksFilename);
+		//usersCollection.readUsersFromFile(usersFilename, tasksCollection);
 		//load Collaborations
 		initialized = true;
 	}
@@ -26,6 +30,9 @@ void Session::init(const char* usersFilename, const char* tasksFilename, const c
 
 void Session::registerUser(MyString username, MyString password)
 {
+	if (username == "" || password == "")
+		throw std::invalid_argument("Invalid username or password!");
+
 	for (size_t i = 0; i < usersCollection.getUsersCount(); i++)
 	{
 		if (usersCollection[i]->getUsername() == username)
@@ -55,24 +62,129 @@ void Session::loginUser(MyString username, MyString password)
 
 void Session::addTask(MyString name, time_t dueDate, MyString description)
 {
-	for (size_t i = 0; i < tasksCollection.getTasksCount(); i++)
+	if (name == "" || description == "")
+		throw std::invalid_argument("Invalid name or description!");
+
+	Vector<unsigned> tasksIds = usersCollection[currentUserIndex]->getTasksIds();
+
+	for (size_t i = 0; i < tasksIds.size(); i++)
 	{
-		if (tasksCollection[i]->getName() == name && tasksCollection[i]->getDueDate() == dueDate)
+		if (tasksCollection.getTaskById(tasksIds[i])->getName() == name && tasksCollection.getTaskById(tasksIds[i])->getDueDate() == dueDate)
 			throw std::invalid_argument("This task already exists!");
 	}
 
-	tasksCollection.addTask(Task(tasksCollection.getTasksCount(), name, dueDate, TaskStatus::ON_HOLD, description));
-	usersCollection[currentUserIndex]->addTaskId(tasksCollection.getTasksCount()-1);
+	unsigned id = 0;
+	if (tasksCollection.getTasksCount() != 0)
+		id = tasksCollection.getMaxTaskId() + 1;
+
+	tasksCollection.addTask(Task(id, name, dueDate, TaskStatus::ON_HOLD, description));
+	usersCollection[currentUserIndex]->addTaskId(id);
 }
 
+void Session::addTask(MyString name, MyString description)
+{
+	if (name == "" || description == "")
+		throw std::invalid_argument("Invalid name or description!");
 
-void Session::updateTaskName(unsigned taskId, MyString newName) 
+	Vector<unsigned> tasksIds = usersCollection[currentUserIndex]->getTasksIds();
+
+	for (size_t i = 0; i < tasksIds.size(); i++)
+	{
+		if (tasksCollection.getTaskById(tasksIds[i])->getName() == name && tasksCollection.getTaskById(tasksIds[i])->getDescription() == description)
+			throw std::invalid_argument("This task already exists!");
+	}
+
+	unsigned id = 0;
+	if (tasksCollection.getTasksCount() != 0)
+		id = tasksCollection.getMaxTaskId() + 1;
+
+	tasksCollection.addTask(Task(id, name, TaskStatus::ON_HOLD, description));
+	usersCollection[currentUserIndex]->addTaskId(id);
+}
+
+void Session::getTask(unsigned taskId) const
+{
+	Vector<unsigned> tasksIds = usersCollection[currentUserIndex].getTasksIds();
+	for (size_t i = 0; i < tasksIds.size(); i++)
+	{
+		if (tasksIds[i] == taskId)
+		{
+			tasksCollection.getTaskById(taskId)->print();
+			return;
+		}
+	}
+
+	std::cout << "There isn't any task with this id!" << std::endl;
+}
+
+void Session::getTask(MyString taskName) const
+{
+	Vector<unsigned> tasksIds = usersCollection[currentUserIndex].getTasksIds();
+	for (size_t i = 0; i < tasksIds.size(); i++)
+	{
+		if (tasksCollection.getTaskById(tasksIds[i])->getName() == taskName)
+		{
+			tasksCollection.getTaskById(tasksIds[i])->print();
+			return;
+		}
+	}
+
+	std::cout << "There isn't any task with this name!" << std::endl;
+}
+
+void Session::listTasks(time_t dueDate) const
+{
+	Vector<unsigned> tasksIds = usersCollection[currentUserIndex].getTasksIds();
+
+	for (size_t i = 0; i < tasksIds.size(); i++)
+	{
+		try
+		{
+			if (tasksCollection.getTaskById(tasksIds[i])->getDueDate() == dueDate)
+				tasksCollection[tasksIds[i]].print();
+		}
+		catch (const std::exception& e)
+		{
+
+		}
+	}
+}
+
+void Session::listAllTasks() const
+{
+	Vector<unsigned> tasksIds = usersCollection[currentUserIndex].getTasksIds();
+	for (size_t i = 0; i < tasksIds.size(); i++)
+		tasksCollection.getTaskById(tasksIds[i])->print();
+
+	if (tasksIds.size() == 0)
+		std::cout << "You still didn't add any tasks!" << std::endl;
+}
+
+void Session::listAllCompletedTasks() const
+{
+	Vector<unsigned> tasksIds = usersCollection[currentUserIndex].getTasksIds();
+
+	bool isThereACompletedTask = false;
+	for (size_t i = 0; i < tasksIds.size(); i++)
+	{
+		if (tasksCollection[tasksIds[i]].getStatus() == TaskStatus::DONE)
+		{
+			tasksCollection[tasksIds[i]].print();
+			isThereACompletedTask = true;
+		}
+	}
+
+	if (!isThereACompletedTask)
+		std::cout << "You still didn't completed any tasks!" << std::endl;
+}
+
+void Session::updateTaskName(unsigned taskId, MyString newName)
 {
 	if (usersCollection[currentUserIndex]->isOwnerOfTheTaskById(taskId))
 	{
 		tasksCollection.getTaskById(taskId)->setNewName(newName);
 	}
-	else 
+	else
 	{
 		throw std::invalid_argument("Invalid task id!");
 	}
@@ -83,6 +195,38 @@ void Session::startTaskById(unsigned taskId)
 	if (usersCollection[currentUserIndex]->isOwnerOfTheTaskById(taskId))
 	{
 		tasksCollection.getTaskById(taskId)->setNewStatus(TaskStatus::IN_PROCESS);
+	}
+	else
+	{
+		throw std::invalid_argument("Invalid task id!");
+	}
+}
+
+void Session::finishTask(unsigned taskId)
+{
+	if (usersCollection[currentUserIndex]->isOwnerOfTheTaskById(taskId))
+	{
+		tasksCollection.getTaskById(taskId)->setNewStatus(TaskStatus::DONE);
+	}
+	else
+	{
+		throw std::invalid_argument("Invalid task id!");
+	}
+}
+
+void Session::deleteTask(unsigned taskId)
+{
+	if (usersCollection[currentUserIndex]->isOwnerOfTheTaskById(taskId))
+	{
+		for (size_t i = 0; i < tasksCollection.getTasksCount(); i++)
+		{
+			if (tasksCollection[i]->getId() == taskId)
+			{
+				tasksCollection.removeTaskByIndex(i);
+				usersCollection[currentUserIndex]->removeTaskId(taskId);
+				break;
+			}
+		}
 	}
 	else
 	{

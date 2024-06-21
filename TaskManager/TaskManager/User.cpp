@@ -24,12 +24,12 @@ void User::setTasksIds(const Vector<unsigned>& ids)
 		tasksIds.push_back(ids[i]);
 }
 
-void User::addTaskId(unsigned id) 
+void User::addTaskId(unsigned id)
 {
 	tasksIds.push_back(id);
 }
 
-bool User::isOwnerOfTheTaskById(unsigned taskId) 
+bool User::isOwnerOfTheTaskById(unsigned taskId)
 {
 	for (size_t i = 0; i < tasksIds.size(); i++)
 	{
@@ -46,7 +46,7 @@ unsigned User::getDashboardTasksIdsCount() const
 	return dashboard.getTasksCount();
 }
 
-const Dashboard& User::getDashboard() const 
+const Dashboard& User::getDashboard() const
 {
 	return this->dashboard;
 }
@@ -54,4 +54,16 @@ const Dashboard& User::getDashboard() const
 void User::addTaskToDashboard(SharedPtr<Task> task)
 {
 	dashboard.addTask(task);
+}
+
+void User::removeTaskId(unsigned taskId)
+{
+	for (size_t i = 0; i < tasksIds.size(); i++)
+	{
+		if (tasksIds[i] == taskId)
+		{
+			tasksIds.erase(i);
+			break;
+		}
+	}
 }

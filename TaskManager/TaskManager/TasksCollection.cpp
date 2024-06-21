@@ -9,8 +9,6 @@ TasksCollection::TasksCollection()
 	capacity = 8;
 	tasksCount = 0;
 	tasks = new SharedPtr<Task>[capacity];
-
-	//fill the collection
 }
 
 TasksCollection::TasksCollection(const TasksCollection& other)
@@ -70,10 +68,13 @@ void TasksCollection::readTasksFromFile(const char* filename)
 		char* taskName = new char[taskNameLength];
 		is.read(taskName, sizeof(char) * taskNameLength);
 
-		bool isThereADueDate
+		bool isThereADueDate = false;
+		is.read((char*)&isThereADueDate, sizeof(bool));
 
 		time_t dueDate = {};
-		is.read((char*)&dueDate, sizeof(time_t));
+
+		if (isThereADueDate)
+			is.read((char*)&dueDate, sizeof(time_t));
 
 		TaskStatus status;
 		is.read((char*)&status, sizeof(TaskStatus));
@@ -89,13 +90,19 @@ void TasksCollection::readTasksFromFile(const char* filename)
 		MyString parsedTaskName(taskName);
 		MyString parsedTaskDescription(description);
 
-		addTask(new Task(id, parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength)));
+		if (isThereADueDate)
+		{
+			addTask(new Task(id, parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength)));
+		}
+		else
+		{
+			addTask(new Task(id, parsedTaskName.substr(0, taskNameLength), status, parsedTaskDescription.substr(0, taskDescriptionLength)));
+		}
 
 		delete[] taskName;
 		delete[] description;
 	}
 }
-
 
 void TasksCollection::addTask(const Task& task)
 {
@@ -159,7 +166,7 @@ void TasksCollection::resize()
 	tasks = newCollection;
 }
 
-SharedPtr<Task> TasksCollection::getTaskById(unsigned id)
+SharedPtr<Task> TasksCollection::getTaskById(unsigned id) const
 {
 	for (size_t i = 0; i < tasksCount; i++)
 	{
@@ -184,12 +191,35 @@ void TasksCollection::saveAllTasksToFile(const char* filename)
 		saveTaskToFile(os, *tasks[i]);
 }
 
-
 void TasksCollection::addTask(Task* task)
 {
 	if (tasksCount == capacity)
 		resize();
 	tasks[tasksCount++] = task;
+}
+
+void TasksCollection::removeTaskByIndex(unsigned index)
+{
+	//TODO: check if i have to invoke the destructor like this
+	if (index >= 0 && index < tasksCount) 
+	{
+		std::swap(tasks[index], tasks[tasksCount-1]);
+		tasks[tasksCount-1].~SharedPtr();
+	}
+
+	tasksCount--;
+}
+
+unsigned TasksCollection::getMaxTaskId() const 
+{
+	unsigned biggestId = 0;
+
+	for (size_t i = 0; i < tasksCount; i++)
+	{
+		if (tasks[i]->getId() > biggestId)
+			biggestId = tasks[i]->getId();
+	}
+	return biggestId;
 }
 
 void TasksCollection::saveTaskToFile(std::ofstream& os, const Task& task)

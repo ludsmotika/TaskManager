@@ -22,6 +22,8 @@ public:
 	const Vector<unsigned>& getTasksIds() const;
 	unsigned getDashboardTasksIdsCount() const;
 
+	void removeTaskId(unsigned taskId);
+
 	void addTaskId(unsigned id);
 	void addTaskToDashboard(SharedPtr<Task> task);
 	bool isOwnerOfTheTaskById(unsigned taskId);

@@ -1,5 +1,6 @@
 #include "Task.h"
 #include "MyString.h"
+#include "GlobalFunctions.h"
 
 Task::Task(unsigned id, MyString name, time_t dueDate, TaskStatus status, MyString description) : id(id), name(name), dueDate(dueDate), status(status), description(description)
 {
@@ -15,9 +16,19 @@ void Task::print() const
 {
 	std::cout << "Task name: " << getName() << std::endl;
 	std::cout << "Task ID: " << getId() << std::endl;
-	std::cout << "Due date: " << getDueDate() << std::endl;
+	try
+	{
+		std::cout << "Due date: ";
+		printTime(getDueDate());
+		std::cout << std::endl;
+	}
+	catch (const std::runtime_error& e)
+	{
+		std::cout << "-" << std::endl;
+	}
 	std::cout << "Status: " << getStatus() << std::endl;
 	std::cout << "Task desc: " << getDescription() << std::endl;
+	std::cout << std::endl;
 }
 
 Task* Task::clone() const

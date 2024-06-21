@@ -1,206 +1,3 @@
-//#include "ProgramEngine.h"
-//#include "MyString.h"
-//#include "GlobalFunctions.h"
-//#include <iomanip>
-//#include <ctime>
-//#include <sstream>
-//
-//void ProgramEngine::run(Session& session)
-//{
-//	char currentRowInput[1024];
-//	while (true)
-//	{
-//		std::cin.getline(currentRowInput, 1024);
-//		MyString currentRow(currentRowInput);
-//
-//		int commandLength;
-//		try
-//		{
-//			commandLength = getLengthToFirstCharOccurence(currentRow, ' ');
-//		}
-//		catch (const std::exception&)
-//		{
-//			commandLength = -1;
-//		}
-//
-//		MyString currentCommand = commandLength == -1 ? currentRow : currentRow.substr(0, commandLength);
-//
-//		if (currentCommand == "register")
-//		{
-//			if (session.isThereALoggedInUser())
-//			{
-//				std::cout << "There is already a logged in user!" << std::endl;
-//			}
-//			else
-//			{
-//				try
-//				{
-//					int usernameLength = getLengthToFirstCharOccurence(currentRow.substr(commandLength + 1, currentRow.getSize() - commandLength - 1), ' ');
-//					MyString username = currentRow.substr(commandLength + 1, usernameLength);
-//					MyString password = currentRow.substr(commandLength + usernameLength + 2, currentRow.getSize() - (commandLength + usernameLength) - 2);
-//
-//					session.registerUser(username, password);
-//					std::cout << "Registered successfully!" << std::endl;
-//				}
-//				catch (const std::invalid_argument& e)
-//				{
-//					std::cout << e.what() << std::endl;
-//				}
-//				catch (...)
-//				{
-//					std::cout << "Unexpected error occured!" << std::endl;
-//				}
-//			}
-//		}
-//		else if (currentCommand == "login")
-//		{
-//			if (session.isThereALoggedInUser())
-//			{
-//				std::cout << "There is already a logged in user!" << std::endl;
-//			}
-//			else
-//			{
-//				try
-//				{
-//					int usernameLength = getLengthToFirstCharOccurence(currentRow.substr(commandLength + 1, currentRow.getSize() - commandLength - 1), ' ');
-//					MyString username = currentRow.substr(commandLength + 1, usernameLength);
-//
-//					MyString password = currentRow.substr(commandLength + usernameLength + 2, currentRow.getSize() - (commandLength + usernameLength) - 2);
-//
-//					session.loginUser(username, password);
-//					std::cout << "Welcome back, " << username << "!" << std::endl;
-//				}
-//				catch (const std::invalid_argument& e)
-//				{
-//					std::cout << e.what() << std::endl;
-//				}
-//				catch (...)
-//				{
-//					std::cout << "Unexpected error occured!" << std::endl;
-//				}
-//			}
-//		}
-//		else if (currentCommand == "add-task")
-//		{
-//			if (!session.isThereALoggedInUser())
-//			{
-//				std::cout << "Login or register in order to add tasks!" << std::endl;
-//			}
-//			else
-//			{
-//				try
-//				{
-//					int taskNameLength = getLengthToFirstCharOccurence(currentRow.substr(commandLength + 1, currentRow.getSize() - commandLength - 1), ' ');
-//					MyString taskName = currentRow.substr(commandLength + 1, taskNameLength);
-//
-//					int dueDateLength = getLengthToFirstCharOccurence(currentRow.substr(commandLength + taskNameLength + 2, currentRow.getSize() - commandLength - taskNameLength - 2), ' ');
-//					MyString dueDate = currentRow.substr(commandLength + taskNameLength + 2, dueDateLength);
-//
-//					MyString description = currentRow.substr(commandLength + taskNameLength + dueDateLength + 3, currentRow.getSize() - (commandLength + taskNameLength + dueDateLength) - 3);
-//
-//					tm tm = {};
-//					std::stringstream ss(dueDate.c_str());
-//					ss >> std::get_time(&tm, "%Y-%m-%d");
-//
-//					session.addTask(taskName, mktime(&tm), description);
-//				}
-//				catch (const std::invalid_argument& e)
-//				{
-//					std::cout << e.what();
-//				}
-//				catch (...)
-//				{
-//					std::cout << "Unexpected error occured!" << std::endl;
-//				}
-//			}
-//		}
-//		else if (currentCommand == "update-task-name")
-//		{
-//		//update-task-name <id> <name>
-//
-//				if (!session.isThereALoggedInUser())
-//				{
-//					std::cout << "Login or register in order to add tasks!" << std::endl;
-//				}
-//				else
-//				{
-//					try
-//					{
-//						int taskNameLength = getLengthToFirstCharOccurence(currentRow.substr(commandLength + 1, currentRow.getSize() - commandLength - 1), ' ');
-//						MyString taskName = currentRow.substr(commandLength + 1, taskNameLength);
-//
-//						int dueDateLength = getLengthToFirstCharOccurence(currentRow.substr(commandLength + taskNameLength + 2, currentRow.getSize() - commandLength - taskNameLength - 2), ' ');
-//						MyString dueDate = currentRow.substr(commandLength + taskNameLength + 2, dueDateLength);
-//
-//						MyString description = currentRow.substr(commandLength + taskNameLength + dueDateLength + 3, currentRow.getSize() - (commandLength + taskNameLength + dueDateLength) - 3);
-//
-//						tm tm = {};
-//						std::stringstream ss(dueDate.c_str());
-//						ss >> std::get_time(&tm, "%Y-%m-%d");
-//
-//						session.addTask(taskName, mktime(&tm), description);
-//					}
-//					catch (const std::invalid_argument& e)
-//					{
-//						std::cout << e.what();
-//					}
-//					catch (...)
-//					{
-//						std::cout << "Unexpected error occured!" << std::endl;
-//					}
-//				}
-//		}
-//		else if (currentCommand == "start-task")
-//		{
-//
-//		}
-//		else if (currentCommand == "update-task-description")
-//		{
-//
-//		}
-//		else if (currentCommand == "remove-task-from-dashboard")
-//		{
-//
-//		}
-//		else if (currentCommand == "delete-task")
-//		{
-//
-//		}
-//		else if (currentCommand == "get-task")
-//		{
-//			//by id or by name
-//		}
-//		else if (currentCommand == "list-tasks")
-//		{
-//			//with or without date
-//		}
-//		else if (currentCommand == "list-completed-tasks")
-//		{
-//
-//		}
-//		else if (currentCommand == "list-dashboard")
-//		{
-//
-//		}
-//		else if (currentCommand == "finish-task")
-//		{
-//
-//		}
-//		else if (currentCommand == "logout")
-//		{
-//
-//		}
-//		else if (currentCommand == "exit")
-//		{
-//			break;
-//		}
-//	}
-//
-//	std::cout << "Exited successfully!";
-//}
-
-
-
 #include "ProgramEngine.h"
 #include "MyString.h"
 #include "GlobalFunctions.h"
@@ -291,8 +88,23 @@ void ProgramEngine::run(Session& session)
 
 					MyString dueDate;
 					currentRow >> dueDate;
+					bool isDueDateValid = isValidDate(dueDate);
 
-					currentRow.ignore();
+					tm tm = {};
+					if (isDueDateValid)
+					{
+						time_t now = time(0);
+						std::stringstream ss(dueDate.c_str());
+						ss >> std::get_time(&tm, "%Y-%m-%d");
+						currentRow.ignore();
+
+						if (mktime(&tm) < now)
+						{
+							throw std::invalid_argument("Cannot add task with date which has already passed!");
+							isDueDateValid = false;
+						}
+					}
+
 					size_t currentPos = currentRow.tellg();
 					currentRow.seekg(0, std::ios::end);
 					size_t endPos = currentRow.tellg();
@@ -305,17 +117,23 @@ void ProgramEngine::run(Session& session)
 					MyString description(remainder);
 					description = description.substr(0, remainingSymbolsCount);
 
-					tm tm = {};
-					std::stringstream ss(dueDate.c_str());
-					ss >> std::get_time(&tm, "%Y-%m-%d");
+					if (isValidDate(dueDate))
+					{
+						session.addTask(taskName, mktime(&tm), description);
+					}
+					else
+					{
+						MyString wholeDescription = dueDate + description;
+						session.addTask(taskName, wholeDescription);
+					}
 
-					session.addTask(taskName, mktime(&tm), description);
+					std::cout << "Task added successfully!" << std::endl;
 
 					delete[] remainder;
 				}
 				catch (const std::invalid_argument& e)
 				{
-					std::cout << e.what();
+					std::cout << e.what() << std::endl;
 				}
 				catch (...)
 				{
@@ -341,11 +159,11 @@ void ProgramEngine::run(Session& session)
 
 					session.updateTaskName(taskId, newName);
 
-					std::cout << "Task name updated successfully!";
+					std::cout << "Task name updated successfully!" << std::endl;
 				}
 				catch (const std::invalid_argument& e)
 				{
-					std::cout << e.what();
+					std::cout << e.what() << std::endl;
 				}
 				catch (...)
 				{
@@ -368,11 +186,11 @@ void ProgramEngine::run(Session& session)
 
 					session.startTaskById(taskId);
 
-					std::cout << "Task started successfully!";
+					std::cout << "Task started successfully!" << std::endl;
 				}
 				catch (const std::invalid_argument& e)
 				{
-					std::cout << e.what();
+					std::cout << e.what() << std::endl;
 				}
 				catch (...)
 				{
@@ -382,10 +200,9 @@ void ProgramEngine::run(Session& session)
 		}
 		else if (currentCommand == "update-task-description")
 		{
-			//update-task-description <id> <description>
 			if (!session.isThereALoggedInUser())
 			{
-				std::cout << "Login or register in order to add tasks!" << std::endl;
+				std::cout << "Login or register in order to update tasks!" << std::endl;
 			}
 			else
 			{
@@ -411,7 +228,7 @@ void ProgramEngine::run(Session& session)
 				}
 				catch (const std::invalid_argument& e)
 				{
-					std::cout << e.what();
+					std::cout << e.what() << std::endl;
 				}
 				catch (...)
 				{
@@ -426,19 +243,102 @@ void ProgramEngine::run(Session& session)
 		}
 		else if (currentCommand == "delete-task")
 		{
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to modify tasks!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					unsigned taskId;
+					currentRow >> taskId;
 
+					session.deleteTask(taskId);
+
+					std::cout << "Task deleted successfully!" << std::endl;
+				}
+				catch (const std::invalid_argument& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
 		}
 		else if (currentCommand == "get-task")
 		{
-			//by id or by name
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to get tasks!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					unsigned taskId = 0;
+					currentRow >> taskId;
+					if (currentRow.fail())
+						throw std::runtime_error("Invalid id!");
+
+					session.getTask(taskId);
+				}
+				catch (const std::exception& e)
+				{
+					currentRow.clear();
+					size_t currentPos = currentRow.tellg();
+					currentRow.seekg(0, std::ios::end);
+					size_t endPos = currentRow.tellg();
+					size_t remainingSymbolsCount = endPos - currentPos;
+					currentRow.seekg(currentPos);
+
+					char* remainder = new char[remainingSymbolsCount];
+					currentRow.read(remainder, remainingSymbolsCount);
+
+					MyString name(remainder);
+					name = name.substr(0, remainingSymbolsCount);
+
+					session.getTask(name);
+				}
+			}
 		}
 		else if (currentCommand == "list-tasks")
 		{
-			//with or without date
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to list tasks!" << std::endl;
+			}
+			else
+			{
+				MyString dueDate;
+				currentRow >> dueDate;
+				bool isDueDateValid = isValidDate(dueDate);
+
+				tm tm = {};
+				if (isDueDateValid)
+				{
+					std::stringstream ss(dueDate.c_str());
+					ss >> std::get_time(&tm, "%Y-%m-%d");
+					session.listTasks(mktime(&tm));
+				}
+				else
+				{
+					session.listAllTasks();
+				}
+			}
 		}
 		else if (currentCommand == "list-completed-tasks")
 		{
-
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to add tasks!" << std::endl;
+			}
+			else
+			{
+				session.listAllCompletedTasks();
+			}
 		}
 		else if (currentCommand == "list-dashboard")
 		{
@@ -446,7 +346,30 @@ void ProgramEngine::run(Session& session)
 		}
 		else if (currentCommand == "finish-task")
 		{
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to modify tasks!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					unsigned taskId;
+					currentRow >> taskId;
 
+					session.finishTask(taskId);
+
+					std::cout << "Task started successfully!" << std::endl;
+				}
+				catch (const std::invalid_argument& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
 		}
 		else if (currentCommand == "logout")
 		{
@@ -454,7 +377,7 @@ void ProgramEngine::run(Session& session)
 			{
 				std::cout << "There isn't a logged in user!" << std::endl;
 			}
-			else 
+			else
 			{
 				session.logout();
 				std::cout << "Logged out successfully!" << std::endl;
@@ -464,6 +387,11 @@ void ProgramEngine::run(Session& session)
 		{
 			session.closeSession();
 			break;
+		}
+		else
+		{
+			std::cout << "Invalid command!" << std::endl;
+			printHelpMenu(session.isThereALoggedInUser());
 		}
 	}
 

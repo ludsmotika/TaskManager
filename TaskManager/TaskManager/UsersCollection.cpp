@@ -18,7 +18,7 @@ void UsersCollection::readUsersFromFile(const char* filename, TasksCollection& t
 		throw std::invalid_argument("NullPtr passed as a parameter");
 
 	std::ifstream is(filename, std::ios::binary);
-
+	
 	if (!is.is_open())
 		throw std::invalid_argument("Cannot open file for writing!");
 
