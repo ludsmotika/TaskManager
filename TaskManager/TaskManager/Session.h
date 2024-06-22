@@ -1,5 +1,6 @@
 #pragma once
 #include "UsersCollection.h"
+#include "CollaborationCollection.h"
 #include "Dashboard.h"
 
 //TODO: think about the dashBoard and where the logic for it should be
@@ -34,6 +35,13 @@ public:
     void listAllTasks() const;
     void listAllCompletedTasks() const;
     void listAllTasksFromDashboard() const;
+    void listCollaborations() const;
+
+    void addCollaboration(MyString collabName);
+    void deleteCollaboration(MyString collabName);
+    void addUserToCollaborationByUsername(MyString collabName, MyString username);
+
+    void listCollaboration(MyString collabName) const;
 
     void closeSession();
 
@@ -47,6 +55,8 @@ private:
 
     UsersCollection usersCollection;
     TasksCollection tasksCollection;
+    CollaborationCollection collaborationsCollection;
+
     int currentUserIndex = -1;
 
     MyString usersFilename;

@@ -5,9 +5,10 @@
 class CollaborationTask : public Task 
 {
 public:
-	void print() const override;
+	CollaborationTask(unsigned id, MyString name, time_t dueDate, TaskStatus status, MyString description, MyString assignee);
 
+	void print() const override;
     Task* clone() const override;
 private:
-	Optional<User> assignee;
+	MyString assignee;
 };

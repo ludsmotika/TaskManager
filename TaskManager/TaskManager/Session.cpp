@@ -285,6 +285,75 @@ void Session::removeTaskFromDashboardById(unsigned taskId)
 	usersCollection[currentUserIndex]->removeTaskFromDashboardById(taskId);
 }
 
+void Session::addCollaboration(MyString collabName)
+{
+	for (size_t i = 0; i < collaborationsCollection.getCollaborationsCount(); i++)
+	{
+		if (collaborationsCollection[i]->getName() == collabName && collaborationsCollection[i]->getCreatorName() == usersCollection[currentUserIndex]->getUsername())
+			throw std::invalid_argument("You have already created a collaboration with this name!");
+	}
+
+	collaborationsCollection.addCollaboration(Collaboration(collaborationsCollection.getMaxCollaborationId() + 1, collabName, usersCollection[currentUserIndex]->getUsername()));
+}
+
+void Session::deleteCollaboration(MyString collabName)
+{
+	for (size_t i = 0; i < collaborationsCollection.getCollaborationsCount(); i++)
+	{
+		if (collaborationsCollection[i]->getName() == collabName)
+			collaborationsCollection.removeCollaborationByIndex(i);
+	}
+}
+
+void Session::listCollaborations() const
+{
+	bool isThereListedCollaborations = false;
+	for (size_t i = 0; i < collaborationsCollection.getCollaborationsCount(); i++)
+	{
+		if (collaborationsCollection[i].isCreatorOfCollaboration(usersCollection[currentUserIndex])
+			|| collaborationsCollection[i].isUserPartOfCollaboration(usersCollection[currentUserIndex]))
+		{
+			std::cout << collaborationsCollection[i].getName() << std::endl;
+			isThereListedCollaborations = true;
+		}
+	}
+
+	if (!isThereListedCollaborations)
+		throw std::runtime_error("There aren't any collaborations that you craeted or you are a part of!");
+}
+
+void Session::addUserToCollaborationByUsername(MyString collabName, MyString username)
+{
+	for (size_t i = 0; i < usersCollection.getUsersCount(); i++)
+	{
+		if (usersCollection[i]->getUsername() == username)
+		{
+			try
+			{
+				//collaborationsCollection.getCollaborationByName(collabName)->addUser(usersCollection[i]);
+				Collaboration& collab = *collaborationsCollection.getCollaborationByName(collabName);
+				collab.addUser(usersCollection[i]);
+				return;
+			}
+			catch (const std::exception&)
+			{
+				std::cout << "There isn't a collaboration with this name!" << std::endl;
+			}
+		}
+	}
+
+	throw std::invalid_argument("There isn't user with this name!");
+}
+
+void Session::listCollaboration(MyString collabName) const
+{
+	if (collaborationsCollection.getCollaborationByName(collabName)->isCreatorOfCollaboration(usersCollection[currentUserIndex])
+		|| collaborationsCollection.getCollaborationByName(collabName)->isUserPartOfCollaboration(usersCollection[currentUserIndex]))
+	{
+		collaborationsCollection.getCollaborationByName(collabName)->printTasks();
+	}
+}
+
 void Session::logout()
 {
 	this->currentUserIndex = -1;

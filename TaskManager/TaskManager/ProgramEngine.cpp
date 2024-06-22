@@ -103,7 +103,7 @@ void ProgramEngine::run(Session& session)
 						time_t now = time(nullptr);
 						tm* localTime = localtime(&now);
 						localTime->tm_hour = 0;
-						localTime->tm_min= 0;
+						localTime->tm_min = 0;
 						localTime->tm_sec = 0;
 						time_t newTime = mktime(localTime);
 
@@ -298,7 +298,7 @@ void ProgramEngine::run(Session& session)
 				{
 					unsigned taskId;
 					currentRow >> taskId;
-					
+
 					if (currentRow.fail())
 						throw std::invalid_argument("Please enter a valid command!");
 
@@ -360,20 +360,32 @@ void ProgramEngine::run(Session& session)
 			}
 			else
 			{
-				MyString dueDate;
-				currentRow >> dueDate;
-				bool isDueDateValid = isValidDate(dueDate);
+				try
+				{
+					MyString filter;
+					currentRow >> filter;
+					bool isDueDateValid = isValidDate(filter);
 
-				tm tm = {};
-				if (isDueDateValid)
-				{
-					std::stringstream ss(dueDate.c_str());
-					ss >> std::get_time(&tm, "%Y-%m-%d");
-					session.listTasks(mktime(&tm));
+					if (filter == "")
+					{
+						session.listAllTasks();
+						continue;
+					}
+
+					tm tm = {};
+					if (isDueDateValid)
+					{
+						std::stringstream ss(filter.c_str());
+						ss >> std::get_time(&tm, "%Y-%m-%d");
+						session.listTasks(mktime(&tm));
+						continue;
+					}
+
+					session.listCollaboration(filter);
 				}
-				else
+				catch (const std::exception& e)
 				{
-					session.listAllTasks();
+					std::cout << e.what() << std::endl;
 				}
 			}
 		}
@@ -455,6 +467,120 @@ void ProgramEngine::run(Session& session)
 					std::cout << "Unexpected error occured!" << std::endl;
 				}
 			}
+		}
+		else if (currentCommand == "add-collaboration")
+		{
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "You need to be logged in order to create collaborations!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					MyString collabName;
+					currentRow >> collabName;
+
+					if (currentRow.fail())
+						throw std::invalid_argument("Invalid name!");
+
+					session.addCollaboration(collabName);
+					std::cout << "Collaboration added successfully!" << std::endl;
+				}
+				catch (const std::invalid_argument& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
+		}
+		else if (currentCommand == "delete-collaboration")
+		{
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "You need to be logged in order to delete collaborations!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					MyString collabName;
+					currentRow >> collabName;
+
+					if (currentRow.fail())
+						throw std::runtime_error("Invalid name!");
+
+					session.deleteCollaboration(collabName);
+					std::cout << "Collaboration deleted successfully!" << std::endl;
+				}
+				catch (const std::invalid_argument& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
+		}
+		else if (currentCommand == "list-collaborations")
+		{
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "You need to be logged in order to print collaborations!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					session.listCollaborations();
+				}
+				catch (const std::runtime_error& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
+		}
+		else if (currentCommand == "add-user")
+		{
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "You need to login in order to modify collaborations!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					MyString collabName;
+					currentRow >> collabName;
+					MyString username;
+					currentRow >> username;
+
+					session.addUserToCollaborationByUsername(collabName, username);
+					std::cout << "User added successfully to " << collabName << "!" << std::endl;
+				}
+				catch (const std::invalid_argument& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
+
+
+		}
+		else if (currentCommand == "assign-task")
+		{
+
 		}
 		else if (currentCommand == "logout")
 		{

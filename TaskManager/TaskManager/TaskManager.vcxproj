@@ -127,6 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Collaboration.cpp" />
+    <ClCompile Include="CollaborationCollection.cpp" />
     <ClCompile Include="CollaborationTask.cpp" />
     <ClCompile Include="Dashboard.cpp" />
     <ClCompile Include="GlobalFunctions.cpp" />
@@ -142,6 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collaboration.h" />
+    <ClInclude Include="CollaborationCollection.h" />
     <ClInclude Include="CollaborationTask.h" />
     <ClInclude Include="Dashboard.h" />
     <ClInclude Include="GlobalFunctions.h" />

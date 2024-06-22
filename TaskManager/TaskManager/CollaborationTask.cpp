@@ -1,6 +1,12 @@
 #include "CollaborationTask.h"
 #include "GlobalFunctions.h"
 
+
+CollaborationTask::CollaborationTask(unsigned id, MyString name, time_t dueDate, TaskStatus status, MyString description, MyString assignee) :Task(id, name, dueDate, status, description), assignee(assignee) 
+{
+
+}
+
 void CollaborationTask::print() const 
 {
 	std::cout << "Task from collaboration" << std::endl;
