@@ -90,7 +90,6 @@ void WeakPtr<T>::free()
 	counter->removeWeakPtr();
 	if (counter->weakCount == 0) //also use count is 0
 		delete counter;
-
 }
 
 template <typename T>
@@ -125,8 +124,21 @@ bool WeakPtr<T>::expired() const
 template <typename T>
 SharedPtr<T> WeakPtr<T>::lock() const
 {
+	//if (expired())
+	//	return SharedPtr<T>();
+	//else 
+	//{
+	//	return SharedPtr<T>(new T(*data));
+	//	//return SharedPtr<T>(data);
+	//}
+
 	if (expired())
 		return SharedPtr<T>();
-	else
-		return SharedPtr<T>(data);
+
+	SharedPtr<T> ptr;
+	ptr.data = data;
+	ptr.counter = counter;
+	counter->addSharedPtr();
+
+	return ptr;
 }

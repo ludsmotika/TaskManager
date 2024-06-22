@@ -23,14 +23,17 @@ public:
     void addTask(MyString taskName, MyString description);
     void deleteTask(unsigned taskId);
 
+    void addTaskToDashboardById(unsigned taskId);
+    void removeTaskFromDashboardById(unsigned taskId);
+
+
     void getTask(unsigned taskId) const;
     void getTask(MyString taskName) const;
 
     void listTasks(time_t dueDate) const;
     void listAllTasks() const;
     void listAllCompletedTasks() const;
-
-
+    void listAllTasksFromDashboard() const;
 
     void closeSession();
 

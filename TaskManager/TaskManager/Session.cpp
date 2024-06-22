@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#pragma warning (disable : 4996)
 
 
 Session::Session() : initialized(false) {}
@@ -21,8 +22,8 @@ void Session::init(const char* usersFilename, const char* tasksFilename, const c
 		this->tasksFilename = tasksFilename;
 		this->collaborationsFilename = collaborationsFilename;
 
-		//tasksCollection.readTasksFromFile(tasksFilename);
-		//usersCollection.readUsersFromFile(usersFilename, tasksCollection);
+		tasksCollection.readTasksFromFile(tasksFilename);
+		usersCollection.readUsersFromFile(usersFilename, tasksCollection);
 		//load Collaborations
 		initialized = true;
 	}
@@ -53,6 +54,7 @@ void Session::loginUser(MyString username, MyString password)
 		if (usersCollection[i]->getUsername() == username && usersCollection[i]->getPassword() == password)
 		{
 			this->currentUserIndex = i;
+			usersCollection[currentUserIndex]->initDashboard(tasksCollection);
 			return;
 		}
 	}
@@ -79,6 +81,15 @@ void Session::addTask(MyString name, time_t dueDate, MyString description)
 
 	tasksCollection.addTask(Task(id, name, dueDate, TaskStatus::ON_HOLD, description));
 	usersCollection[currentUserIndex]->addTaskId(id);
+
+
+	time_t now = time(nullptr);
+	tm* localTime1 = localtime(&now);
+	tm* localTime2 = localtime(&now);
+
+	if (localTime1->tm_year == localTime2->tm_year && localTime1->tm_mon == localTime2->tm_mon && localTime1->tm_mday == localTime2->tm_mday)
+		usersCollection[currentUserIndex]->addTaskToDashboard(tasksCollection.getTaskById(id));
+
 }
 
 void Session::addTask(MyString name, MyString description)
@@ -178,6 +189,14 @@ void Session::listAllCompletedTasks() const
 		std::cout << "You still didn't completed any tasks!" << std::endl;
 }
 
+void Session::listAllTasksFromDashboard() const
+{
+	if (usersCollection[currentUserIndex].getDashboardTasksIdsCount() == 0)
+		std::cout << "You still didn't add any tasks to the dashboard!" << std::endl;
+
+	usersCollection[currentUserIndex].printDashboard();
+}
+
 void Session::updateTaskName(unsigned taskId, MyString newName)
 {
 	if (usersCollection[currentUserIndex]->isOwnerOfTheTaskById(taskId))
@@ -222,6 +241,7 @@ void Session::deleteTask(unsigned taskId)
 		{
 			if (tasksCollection[i]->getId() == taskId)
 			{
+				usersCollection[currentUserIndex]->removeTaskFromDashboardById(taskId);
 				tasksCollection.removeTaskByIndex(i);
 				usersCollection[currentUserIndex]->removeTaskId(taskId);
 				break;
@@ -244,6 +264,25 @@ void Session::updateTaskDescription(unsigned taskId, MyString newDescription)
 	{
 		throw std::invalid_argument("Invalid task id!");
 	}
+}
+
+void Session::addTaskToDashboardById(unsigned taskId)
+{
+	if (!usersCollection[currentUserIndex]->isOwnerOfTheTaskById(taskId))
+		throw std::invalid_argument("Invalid task id!");
+
+	if (tasksCollection.getTaskById(taskId)->getStatus() == TaskStatus::OVERDUE)
+		throw std::invalid_argument("You cannot add this task to the dashboard because it's overdue!");
+
+	usersCollection[currentUserIndex]->addTaskToDashboard(tasksCollection.getTaskById(taskId));
+}
+
+void Session::removeTaskFromDashboardById(unsigned taskId)
+{
+	if (!usersCollection[currentUserIndex]->isOwnerOfTheTaskById(taskId))
+		throw std::invalid_argument("Invalid task id!");
+
+	usersCollection[currentUserIndex]->removeTaskFromDashboardById(taskId);
 }
 
 void Session::logout()

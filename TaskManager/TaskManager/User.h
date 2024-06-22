@@ -18,7 +18,9 @@ public:
 	User(MyString username, MyString password);
 	const MyString& getUsername() const;
 	const MyString& getPassword() const;
-	const Dashboard& getDashboard() const;
+	Dashboard getDashboard() const;
+	void printDashboard() const;
+	void initDashboard(const TasksCollection& tasksCollection);
 	const Vector<unsigned>& getTasksIds() const;
 	unsigned getDashboardTasksIdsCount() const;
 
@@ -26,6 +28,7 @@ public:
 
 	void addTaskId(unsigned id);
 	void addTaskToDashboard(SharedPtr<Task> task);
+	void removeTaskFromDashboardById(unsigned taskId);
 	bool isOwnerOfTheTaskById(unsigned taskId);
 
 	void setTasksIds(const Vector<unsigned>& ids);

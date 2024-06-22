@@ -90,8 +90,14 @@ void UsersCollection::saveUserToFile(std::ofstream& os, const User& user)
 	unsigned dashboardTaskIdsCount = user.getDashboard().getTasksCount();
 
 	os.write((const char*)&dashboardTaskIdsCount, sizeof(unsigned));
-	for (size_t i = 0; i < dashboardTaskIdsCount; i++)
-		os.write((const char*)user.getDashboard()[i].lock()->getId(), sizeof(unsigned));
+	for (size_t i = 0; i < dashboardTaskIdsCount; i++) 
+	{
+		if (!user.getDashboard()[i].expired())
+		{
+		unsigned currentDashboardTaskId = user.getDashboard()[i].lock()->getId();
+		os.write((const char*)&currentDashboardTaskId, sizeof(unsigned));
+		}
+	}
 }
 
 size_t UsersCollection::getUsersCount() const

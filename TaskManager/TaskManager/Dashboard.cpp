@@ -48,7 +48,7 @@ void Dashboard::addTask(SharedPtr<Task> task)
 {
 	if (tasksCount == capacity)
 		resize();
-	tasks[tasksCount++]= WeakPtr<Task>(task);
+	tasks[tasksCount++] = WeakPtr<Task>(task);
 }
 
 void Dashboard::addTask(const Task& task)
@@ -61,7 +61,7 @@ size_t Dashboard::getTasksCount() const
 	return tasksCount;
 }
 
-WeakPtr<Task> Dashboard::operator[] (unsigned index) const
+const WeakPtr<Task>& Dashboard::operator[] (unsigned index) const
 {
 	return tasks[index];
 }
@@ -99,4 +99,23 @@ void Dashboard::resize()
 		newCollection[i] = tasks[i];
 	delete[] tasks;
 	tasks = newCollection;
+}
+
+
+void Dashboard::removeTaskById(unsigned taskId)
+{
+	for (size_t i = 0; i < tasksCount; i++)
+	{
+		if (!tasks[i].expired())
+		{
+			if (tasks[i].lock()->getId() == taskId)
+			{
+				std::swap(tasks[i], tasks[tasksCount - 1]);
+				tasks[tasksCount - 1].~WeakPtr();
+				tasksCount--;
+				break;
+			}
+		}
+	}
+
 }

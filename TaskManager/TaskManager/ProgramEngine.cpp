@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#pragma warning (disable : 4996)
 
 
 void ProgramEngine::run(Session& session)
@@ -90,15 +91,23 @@ void ProgramEngine::run(Session& session)
 					currentRow >> dueDate;
 					bool isDueDateValid = isValidDate(dueDate);
 
-					tm tm = {};
+					tm tm1 = {};
 					if (isDueDateValid)
 					{
-						time_t now = time(0);
 						std::stringstream ss(dueDate.c_str());
-						ss >> std::get_time(&tm, "%Y-%m-%d");
+
+						ss >> std::get_time(&tm1, "%Y-%m-%d");
 						currentRow.ignore();
 
-						if (mktime(&tm) < now)
+
+						time_t now = time(nullptr);
+						tm* localTime = localtime(&now);
+						localTime->tm_hour = 0;
+						localTime->tm_min= 0;
+						localTime->tm_sec = 0;
+						time_t newTime = mktime(localTime);
+
+						if (mktime(&tm1) < newTime)
 						{
 							throw std::invalid_argument("Cannot add task with date which has already passed!");
 							isDueDateValid = false;
@@ -119,7 +128,7 @@ void ProgramEngine::run(Session& session)
 
 					if (isValidDate(dueDate))
 					{
-						session.addTask(taskName, mktime(&tm), description);
+						session.addTask(taskName, mktime(&tm1), description);
 					}
 					else
 					{
@@ -154,6 +163,9 @@ void ProgramEngine::run(Session& session)
 					unsigned taskId;
 					currentRow >> taskId;
 
+					if (currentRow.fail())
+						throw std::invalid_argument("Invalid id!");
+
 					MyString newName;
 					currentRow >> newName;
 
@@ -184,6 +196,9 @@ void ProgramEngine::run(Session& session)
 					unsigned taskId;
 					currentRow >> taskId;
 
+					if (currentRow.fail())
+						throw std::invalid_argument("Invalid id!");
+
 					session.startTaskById(taskId);
 
 					std::cout << "Task started successfully!" << std::endl;
@@ -211,6 +226,9 @@ void ProgramEngine::run(Session& session)
 					unsigned taskId;
 					currentRow >> taskId;
 
+					if (currentRow.fail())
+						throw std::invalid_argument("Please enter a valid command!");
+
 					currentRow.ignore();
 					size_t currentPos = currentRow.tellg();
 					currentRow.seekg(0, std::ios::end);
@@ -225,6 +243,7 @@ void ProgramEngine::run(Session& session)
 					newDescription = newDescription.substr(0, remainingSymbolsCount);
 
 					session.updateTaskDescription(taskId, newDescription);
+					std::cout << "Task description updated successfully!" << std::endl;
 				}
 				catch (const std::invalid_argument& e)
 				{
@@ -239,7 +258,33 @@ void ProgramEngine::run(Session& session)
 		}
 		else if (currentCommand == "remove-task-from-dashboard")
 		{
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to modify tasks!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					unsigned taskId;
+					currentRow >> taskId;
 
+					if (currentRow.fail())
+						throw std::invalid_argument("Please enter a valid command!");
+
+					session.removeTaskFromDashboardById(taskId);
+
+					std::cout << "Task removed successfully!" << std::endl;
+				}
+				catch (const std::invalid_argument& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
 		}
 		else if (currentCommand == "delete-task")
 		{
@@ -253,6 +298,9 @@ void ProgramEngine::run(Session& session)
 				{
 					unsigned taskId;
 					currentRow >> taskId;
+					
+					if (currentRow.fail())
+						throw std::invalid_argument("Please enter a valid command!");
 
 					session.deleteTask(taskId);
 
@@ -340,9 +388,46 @@ void ProgramEngine::run(Session& session)
 				session.listAllCompletedTasks();
 			}
 		}
+		else if (currentCommand == "add-task-to-dashboard")
+		{
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to modify tasks!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					unsigned taskId;
+					currentRow >> taskId;
+
+					if (currentRow.fail())
+						throw std::invalid_argument("Please enter a valid command!");
+
+					session.addTaskToDashboardById(taskId);
+
+					std::cout << "Task added successfully!" << std::endl;
+				}
+				catch (const std::invalid_argument& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
+		}
 		else if (currentCommand == "list-dashboard")
 		{
-
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to list tasks!" << std::endl;
+			}
+			else
+			{
+				session.listAllTasksFromDashboard();
+			}
 		}
 		else if (currentCommand == "finish-task")
 		{

@@ -1,8 +1,7 @@
 #include "TasksCollection.h"
 #include "GlobalFunctions.h"
 #include <fstream>
-
-//TODO see if this constructor will work right after thinking about how to save the tasks
+#pragma warning (disable : 4996)
 
 TasksCollection::TasksCollection()
 {
@@ -92,6 +91,17 @@ void TasksCollection::readTasksFromFile(const char* filename)
 
 		if (isThereADueDate)
 		{
+			
+			time_t now = time(nullptr);
+			tm* localTime = localtime(&now);
+			localTime->tm_hour = 0;
+			localTime->tm_min = 0;
+			localTime->tm_sec = 0;
+			time_t currentTime = mktime(localTime);
+
+			if (dueDate < currentTime)
+				status = TaskStatus::OVERDUE;
+
 			addTask(new Task(id, parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength)));
 		}
 		else
@@ -200,7 +210,6 @@ void TasksCollection::addTask(Task* task)
 
 void TasksCollection::removeTaskByIndex(unsigned index)
 {
-	//TODO: check if i have to invoke the destructor like this
 	if (index >= 0 && index < tasksCount) 
 	{
 		std::swap(tasks[index], tasks[tasksCount-1]);

@@ -112,7 +112,7 @@ void printHelpMenu(bool isThereALoggedInUser)
 	else
 	{
 		std::cout << std::endl;
-		std::cout << "You can use the following commands!";
+		std::cout << "You can use the following commands!" << std::endl;
 		std::cout << "register <username> <password>" << std::endl;
 		std::cout << "login <username> <password>" << std::endl;
 		std::cout << "exit" << std::endl;

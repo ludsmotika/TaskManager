@@ -16,11 +16,13 @@ public:
 	~Dashboard();
 
     void addTask(SharedPtr<Task> task);
-    void addTask(const Task& task);
+	void addTask(const Task& task);
+
+	void removeTaskById(unsigned taskId);
 
 	size_t getTasksCount() const;
 
-	WeakPtr<Task> operator[] (unsigned index) const;
+	const WeakPtr<Task>& operator[] (unsigned index) const;
 private:
 	WeakPtr<Task>* tasks;
 	unsigned tasksCount;
