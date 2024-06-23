@@ -15,6 +15,8 @@ public:
 
 	void addUser(const User& user);
 
+	const User& getUserByUsername(MyString username) const;
+
 	static void saveUserToFile(std::ofstream& os,const User& user);
 	
 	void saveAllUserToFile(const char* filename) const;

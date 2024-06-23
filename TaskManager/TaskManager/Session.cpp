@@ -301,7 +301,12 @@ void Session::deleteCollaboration(MyString collabName)
 	for (size_t i = 0; i < collaborationsCollection.getCollaborationsCount(); i++)
 	{
 		if (collaborationsCollection[i]->getName() == collabName)
+		{
+			if (!collaborationsCollection[i]->isCreatorOfCollaboration(*usersCollection[currentUserIndex]))
+				throw std::invalid_argument("Only the creator of the collaboration can delete it!");
+
 			collaborationsCollection.removeCollaborationByIndex(i);
+		}
 	}
 }
 
@@ -330,14 +335,22 @@ void Session::addUserToCollaborationByUsername(MyString collabName, MyString use
 		{
 			try
 			{
-				//collaborationsCollection.getCollaborationByName(collabName)->addUser(usersCollection[i]);
-				Collaboration& collab = *collaborationsCollection.getCollaborationByName(collabName);
-				collab.addUser(usersCollection[i]);
+				if (collaborationsCollection.getCollaborationByName(collabName)->isUserPartOfCollaboration(*usersCollection[i]))
+					throw std::invalid_argument("This user is already a part of the collaboration!");
+
+				collaborationsCollection.getCollaborationByName(collabName)->addUser(*usersCollection[i]);
+				std::cout << "User added successfully to " << collabName << "!" << std::endl;
 				return;
 			}
-			catch (const std::exception&)
+			catch (const std::invalid_argument& e)
+			{
+				std::cout << e.what() << std::endl;
+				return;
+			}
+			catch (const std::exception& e)
 			{
 				std::cout << "There isn't a collaboration with this name!" << std::endl;
+				return;
 			}
 		}
 	}
@@ -352,7 +365,38 @@ void Session::listCollaboration(MyString collabName) const
 	{
 		collaborationsCollection.getCollaborationByName(collabName)->printTasks();
 	}
+	else
+	{
+		throw std::invalid_argument("You cannot list the tasks from this collaboration!");
+	}
 }
+
+void Session::addCollaborationTask(MyString collabName, MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
+{
+	if (!collaborationsCollection.getCollaborationByName(collabName)->isCreatorOfCollaboration(*usersCollection[currentUserIndex]))
+		throw std::invalid_argument("You have to be the creator of the collaboration in order to assign tasks!");
+
+	if (!collaborationsCollection.getCollaborationByName(collabName)->isUserPartOfCollaboration(usersCollection.getUserByUsername(username)))
+		throw std::invalid_argument("You can only assign tasks to users which are in the collaboration!");
+
+	if (collaborationsCollection.getCollaborationByName(collabName)->isTaskAlreadyInTheCollaboration(username, taskName, taskDueDate, taskDescription))
+		throw std::invalid_argument("This task is already assigned to the user!");
+
+	unsigned taskId = tasksCollection.getMaxTaskId() + 1;
+	CollaborationTask* task = new CollaborationTask(taskId,taskName,taskDueDate,TaskStatus::ON_HOLD,taskDescription,username);
+	tasksCollection.addTask(task);
+	collaborationsCollection.getCollaborationByName(collabName)->addCollaborationTask(task);
+	
+	for (size_t i = 0; i < usersCollection.getUsersCount(); i++)
+	{
+		if (usersCollection[i]->getUsername() == username) 
+		{
+			usersCollection[i]->addTaskId(taskId);
+			break;
+		}
+	}
+}
+
 
 void Session::logout()
 {

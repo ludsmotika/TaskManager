@@ -18,7 +18,7 @@ void UsersCollection::readUsersFromFile(const char* filename, TasksCollection& t
 		throw std::invalid_argument("NullPtr passed as a parameter");
 
 	std::ifstream is(filename, std::ios::binary);
-	
+
 	if (!is.is_open())
 		throw std::invalid_argument("Cannot open file for writing!");
 
@@ -90,12 +90,12 @@ void UsersCollection::saveUserToFile(std::ofstream& os, const User& user)
 	unsigned dashboardTaskIdsCount = user.getDashboard().getTasksCount();
 
 	os.write((const char*)&dashboardTaskIdsCount, sizeof(unsigned));
-	for (size_t i = 0; i < dashboardTaskIdsCount; i++) 
+	for (size_t i = 0; i < dashboardTaskIdsCount; i++)
 	{
 		if (!user.getDashboard()[i].expired())
 		{
-		unsigned currentDashboardTaskId = user.getDashboard()[i].lock()->getId();
-		os.write((const char*)&currentDashboardTaskId, sizeof(unsigned));
+			unsigned currentDashboardTaskId = user.getDashboard()[i].lock()->getId();
+			os.write((const char*)&currentDashboardTaskId, sizeof(unsigned));
 		}
 	}
 }
@@ -113,6 +113,17 @@ User* UsersCollection::operator[] (unsigned index)
 const User& UsersCollection::operator[] (unsigned index) const
 {
 	return users[index];
+}
+
+const User& UsersCollection::getUserByUsername(MyString username) const
+{
+	for (size_t i = 0; i < getUsersCount(); i++)
+	{
+		if (users[i].getUsername() == username)
+			return users[i];
+	}
+
+	throw std::invalid_argument("There isn't a user with this username!");
 }
 
 void UsersCollection::addUser(const User& user)

@@ -40,6 +40,7 @@ public:
     void addCollaboration(MyString collabName);
     void deleteCollaboration(MyString collabName);
     void addUserToCollaborationByUsername(MyString collabName, MyString username);
+    void addCollaborationTask(MyString collabName, MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
 
     void listCollaboration(MyString collabName) const;
 

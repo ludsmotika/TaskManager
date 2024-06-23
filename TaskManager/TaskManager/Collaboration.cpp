@@ -26,18 +26,18 @@ bool Collaboration::isUserPartOfCollaboration(const User& user) const
 	return false;
 }
 
-void Collaboration::addUser(const SharedPtr<User>& user)
+void Collaboration::addUser(const User& user)
 {
 	bool isUserAlreadyInCollaboration = false;
 
 	for (size_t i = 0; i < workingUsers.getUsersCount(); i++)
 	{
-		if (workingUsers[i]->getUsername() == user->getUsername())
+		if (workingUsers[i]->getUsername() == user.getUsername())
 			isUserAlreadyInCollaboration = true;
 	}
 
 	if (!isUserAlreadyInCollaboration)
-		workingUsers.addUser(*user);
+		workingUsers.addUser(user);
 }
 
 void Collaboration::printTasks() const 
@@ -47,6 +47,23 @@ void Collaboration::printTasks() const
 
 	for (size_t i = 0; i < tasks.getTasksCount(); i++)
 		tasks[i].print() ;
+}
+
+void Collaboration::addCollaborationTask(CollaborationTask* task)
+{
+	tasks.addTask(task);
+}
+
+bool Collaboration::isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription) 
+{
+	for (size_t i = 0; i < tasks.getTasksCount(); i++)
+	{
+		SharedPtr<CollaborationTask> currentTask = (CollaborationTask*)(tasks[i].operator->());
+		if (currentTask->getAssignee() == username && currentTask->getName() == taskName && currentTask->getDueDate() == taskDueDate && currentTask->getDescription() == taskDescription)
+			return true;
+	}
+
+	return false;
 }
 
 

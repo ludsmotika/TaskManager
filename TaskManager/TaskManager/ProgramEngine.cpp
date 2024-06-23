@@ -564,7 +564,6 @@ void ProgramEngine::run(Session& session)
 					currentRow >> username;
 
 					session.addUserToCollaborationByUsername(collabName, username);
-					std::cout << "User added successfully to " << collabName << "!" << std::endl;
 				}
 				catch (const std::invalid_argument& e)
 				{
@@ -580,7 +579,79 @@ void ProgramEngine::run(Session& session)
 		}
 		else if (currentCommand == "assign-task")
 		{
+			//assign-task <collaboration name> <username> <name> <due_date> <description>
+			if (!session.isThereALoggedInUser())
+			{
+				std::cout << "Login or register in order to assign tasks!" << std::endl;
+			}
+			else
+			{
+				try
+				{
+					MyString collabName;
+					currentRow >> collabName;
 
+					MyString username;
+					currentRow >> username;
+
+					MyString taskName;
+					currentRow >> taskName;
+
+					MyString taskDueDate;
+					currentRow >> taskDueDate;
+
+					size_t currentPos = currentRow.tellg();
+					currentRow.seekg(0, std::ios::end);
+					size_t endPos = currentRow.tellg();
+					size_t remainingSymbolsCount = endPos - currentPos;
+					currentRow.seekg(currentPos);
+
+					char* remainder = new char[remainingSymbolsCount];
+					currentRow.read(remainder, remainingSymbolsCount);
+
+					MyString taskDescription(remainder);
+					taskDescription = taskDescription.substr(0, remainingSymbolsCount);
+					delete[] remainder;
+
+					if (collabName == "" || username == "" || taskName == "" || taskDueDate == "" || taskDescription == "")
+						throw std::invalid_argument("Invalid parameters!");
+
+					bool isDueDateValid = isValidDate(taskDueDate);
+
+					tm tm1 = {};
+					if (isDueDateValid)
+					{
+						std::stringstream ss(taskDueDate.c_str());
+
+						ss >> std::get_time(&tm1, "%Y-%m-%d");
+
+						time_t now = time(nullptr);
+						tm* localTime = localtime(&now);
+						localTime->tm_hour = 0;
+						localTime->tm_min = 0;
+						localTime->tm_sec = 0;
+						time_t newTime = mktime(localTime);
+
+						if (mktime(&tm1) < newTime)
+							throw std::invalid_argument("Cannot add task with date which has already passed!");
+					}
+					else
+					{
+						throw std::invalid_argument("Please enter a valid date!");
+					}
+
+					session.addCollaborationTask(collabName, username, taskName, mktime(&tm1), taskDescription);
+					std::cout << "Task assigned successfully to " << username << "!" << std::endl;
+				}
+				catch (const std::invalid_argument& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
+				catch (...)
+				{
+					std::cout << "Unexpected error occured!" << std::endl;
+				}
+			}
 		}
 		else if (currentCommand == "logout")
 		{

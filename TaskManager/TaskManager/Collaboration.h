@@ -3,7 +3,7 @@
 #include "TasksCollection.h";
 #include "CollaborationTask.h";
 
-class Collaboration 
+class Collaboration
 {
 public:
 
@@ -15,8 +15,11 @@ public:
 
 	bool isCreatorOfCollaboration(const User& user) const;
 	bool isUserPartOfCollaboration(const User& user) const;
+	bool isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
 
-	void addUser(const SharedPtr<User>& user);
+	void addCollaborationTask(CollaborationTask* task);
+
+	void addUser(const User& user);
 	void printTasks() const;
 private:
 	unsigned id;

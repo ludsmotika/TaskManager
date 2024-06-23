@@ -7,6 +7,12 @@ CollaborationTask::CollaborationTask(unsigned id, MyString name, time_t dueDate,
 
 }
 
+MyString CollaborationTask::getAssignee() const 
+{
+	return this->assignee;
+}
+
+
 void CollaborationTask::print() const 
 {
 	std::cout << "Task from collaboration" << std::endl;
