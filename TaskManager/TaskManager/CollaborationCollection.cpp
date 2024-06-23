@@ -1,4 +1,5 @@
 #include "CollaborationCollection.h"
+#include <fstream>
 
 CollaborationCollection::CollaborationCollection()
 {
@@ -44,9 +45,73 @@ CollaborationCollection::~CollaborationCollection()
 	free();
 }
 
-void CollaborationCollection::readCollaborationsFromFile(const char* filename)
+void CollaborationCollection::readCollaborationsFromFile(const char* filename, UsersCollection& usersCollection, TasksCollection& tasksCollection)
 {
+	if (!filename)
+		throw std::invalid_argument("Nullptr passed as an argument");
 
+	std::ifstream is(filename, std::ios::binary | std::ios::in);
+
+	if (!is.is_open())
+		throw std::invalid_argument("Cannot open file for reading!");
+
+	while (true)
+	{
+		unsigned id;
+		is.read((char*)&id, sizeof(unsigned));
+
+		size_t collabNameLength;
+		is.read((char*)&collabNameLength, sizeof(size_t));
+
+		char* collabName = new char[collabNameLength];
+		is.read(collabName, sizeof(char) * collabNameLength);
+
+		size_t creatorNameLength;
+		is.read((char*)&creatorNameLength, sizeof(size_t));
+
+		char* creatorName = new char[creatorNameLength];
+		is.read(creatorName, sizeof(char) * creatorNameLength);
+
+		if (is.eof()) break;
+
+		MyString parsedCollabName(collabName);
+		MyString parsedCreatorName(creatorName);
+
+		Collaboration* collab = new Collaboration(id, parsedCollabName.substr(0,collabNameLength), parsedCreatorName.substr(0, creatorNameLength));
+		
+		size_t workersCount;
+		is.read((char*)&workersCount, sizeof(size_t));
+
+		for (size_t i = 0; i < workersCount; i++)
+		{
+			size_t currentWorkingUserNameLength;
+			is.read((char*)&currentWorkingUserNameLength, sizeof(size_t));
+
+			char* currentWorkingUserName = new char[currentWorkingUserNameLength];
+			is.read(currentWorkingUserName, sizeof(char) * currentWorkingUserNameLength);
+
+			MyString parsedCurrentUsername(currentWorkingUserName);
+
+			collab->addUser(usersCollection.getUserByUsername(parsedCurrentUsername.substr(0, currentWorkingUserNameLength)));
+		}
+
+
+		size_t tasksCount;
+		is.read((char*)&tasksCount, sizeof(size_t));
+
+		for (size_t i = 0; i < tasksCount; i++)
+		{
+			unsigned currentTaskId;
+			is.read((char*)&currentTaskId, sizeof(unsigned));
+
+			collab->addCollaborationTask(tasksCollection.getTaskById(currentTaskId));
+		}
+
+		addCollaboration(collab);
+
+		delete[] collabName;
+		delete[] creatorName;
+	}
 }
 
 void CollaborationCollection::addCollaboration(Collaboration* collaboration)
@@ -89,7 +154,6 @@ SharedPtr<Collaboration> CollaborationCollection::getCollaborationByName(MyStrin
 	return SharedPtr<Collaboration>();
 }
 
-
 unsigned CollaborationCollection::getMaxCollaborationId() const
 {
 	unsigned biggestId = 0;
@@ -118,7 +182,7 @@ void CollaborationCollection::removeCollaborationByIndex(unsigned index)
 	if (index >= 0 && index < collaborationsCount)
 	{
 		std::swap(collaborations[index], collaborations[collaborationsCount - 1]);
-		collaborations[collaborationsCount - 1].~SharedPtr();
+		//collaborations[collaborationsCount - 1].~SharedPtr();
 	}
 
 	collaborationsCount--;
@@ -126,7 +190,16 @@ void CollaborationCollection::removeCollaborationByIndex(unsigned index)
 
 void CollaborationCollection::saveAllCollaborationsToFile(const char* filename)
 {
+	if (!filename)
+		throw std::invalid_argument("Nullptr passed as a parameter!");
 
+	std::ofstream os(filename, std::ios::out | std::ios::binary);
+
+	if (!os.is_open())
+		throw std::invalid_argument("Cannot open file for reading!");
+
+	for (size_t i = 0; i < collaborationsCount; i++)
+		collaborations[i]->saveToFile(os);
 }
 
 void CollaborationCollection::free()

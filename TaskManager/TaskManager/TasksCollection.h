@@ -17,7 +17,7 @@ public:
 
 	void readTasksFromFile(const char* filename);
 
-	void addTask(Task* task);
+	void addTask(const SharedPtr<Task>& task);
 	void addTask(const Task& task);
 
 	size_t getTasksCount() const;
@@ -41,5 +41,5 @@ private:
 	void moveFrom(TasksCollection&& other);
 	void resize();
 
-	void saveTaskToFile(std::ofstream& os, const Task& task);
+	void saveTaskToFile(std::ofstream& os, Task& task);
 };

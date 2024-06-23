@@ -5,6 +5,7 @@
 #include <iomanip>
 #pragma warning (disable : 4996)
 
+unsigned Session::id = 0;
 
 Session::Session() : initialized(false) {}
 
@@ -22,9 +23,9 @@ void Session::init(const char* usersFilename, const char* tasksFilename, const c
 		this->tasksFilename = tasksFilename;
 		this->collaborationsFilename = collaborationsFilename;
 
-//tasksCollection.readTasksFromFile(tasksFilename);
-	//usersCollection.readUsersFromFile(usersFilename, tasksCollection);
-		//load Collaborations
+		tasksCollection.readTasksFromFile(tasksFilename);
+		usersCollection.readUsersFromFile(usersFilename, tasksCollection);
+		collaborationsCollection.readCollaborationsFromFile(collaborationsFilename, usersCollection, tasksCollection);
 		initialized = true;
 	}
 }
@@ -75,13 +76,9 @@ void Session::addTask(MyString name, time_t dueDate, MyString description)
 			throw std::invalid_argument("This task already exists!");
 	}
 
-	unsigned id = 0;
-	if (tasksCollection.getTasksCount() != 0)
-		id = tasksCollection.getMaxTaskId() + 1;
 
 	tasksCollection.addTask(Task(id, name, dueDate, TaskStatus::ON_HOLD, description));
 	usersCollection[currentUserIndex]->addTaskId(id);
-
 
 	time_t now = time(nullptr);
 	tm* localTime1 = localtime(&now);
@@ -90,6 +87,7 @@ void Session::addTask(MyString name, time_t dueDate, MyString description)
 	if (localTime1->tm_year == localTime2->tm_year && localTime1->tm_mon == localTime2->tm_mon && localTime1->tm_mday == localTime2->tm_mday)
 		usersCollection[currentUserIndex]->addTaskToDashboard(tasksCollection.getTaskById(id));
 
+	id++;
 }
 
 void Session::addTask(MyString name, MyString description)
@@ -105,12 +103,10 @@ void Session::addTask(MyString name, MyString description)
 			throw std::invalid_argument("This task already exists!");
 	}
 
-	unsigned id = 0;
-	if (tasksCollection.getTasksCount() != 0)
-		id = tasksCollection.getMaxTaskId() + 1;
-
 	tasksCollection.addTask(Task(id, name, TaskStatus::ON_HOLD, description));
 	usersCollection[currentUserIndex]->addTaskId(id);
+
+	id++;
 }
 
 void Session::getTask(unsigned taskId) const
@@ -298,6 +294,10 @@ void Session::addCollaboration(MyString collabName)
 
 void Session::deleteCollaboration(MyString collabName)
 {
+
+	if (!collaborationsCollection.getCollaborationByName(collabName).isInitlized())
+		throw std::invalid_argument("There isn't a collaboration with this name!");
+
 	for (size_t i = 0; i < collaborationsCollection.getCollaborationsCount(); i++)
 	{
 		if (collaborationsCollection[i]->getName() == collabName)
@@ -307,7 +307,6 @@ void Session::deleteCollaboration(MyString collabName)
 
 			collaborationsCollection[i]->removeTasksForUsers(usersCollection);
 			collaborationsCollection.removeCollaborationByIndex(i);
-
 		}
 	}
 }
@@ -376,7 +375,7 @@ void Session::listCollaboration(MyString collabName) const
 
 void Session::addCollaborationTask(MyString collabName, MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
 {
-	if(!collaborationsCollection.getCollaborationByName(collabName).isInitlized())
+	if (!collaborationsCollection.getCollaborationByName(collabName).isInitlized())
 		throw std::invalid_argument("There isn't a collaboration with this name!");
 
 	if (!collaborationsCollection.getCollaborationByName(collabName)->isCreatorOfCollaboration(*usersCollection[currentUserIndex]))
@@ -388,22 +387,20 @@ void Session::addCollaborationTask(MyString collabName, MyString username, MyStr
 	if (collaborationsCollection.getCollaborationByName(collabName)->isTaskAlreadyInTheCollaboration(username, taskName, taskDueDate, taskDescription))
 		throw std::invalid_argument("This task is already assigned to the user!");
 
-	unsigned id = 0;
-	if (tasksCollection.getTasksCount() != 0)
-		id = tasksCollection.getMaxTaskId() + 1;
-
-	CollaborationTask* task = new CollaborationTask(id,taskName,taskDueDate,TaskStatus::ON_HOLD,taskDescription,username);
+	SharedPtr<Task> task(new CollaborationTask(id, taskName, taskDueDate, TaskStatus::ON_HOLD, taskDescription, username));
 	tasksCollection.addTask(task);
 	collaborationsCollection.getCollaborationByName(collabName)->addCollaborationTask(task);
-	
+
 	for (size_t i = 0; i < usersCollection.getUsersCount(); i++)
 	{
-		if (usersCollection[i]->getUsername() == username) 
+		if (usersCollection[i]->getUsername() == username)
 		{
 			usersCollection[i]->addTaskId(id);
 			break;
 		}
 	}
+
+	id++;
 }
 
 void Session::logout()
@@ -421,4 +418,5 @@ void Session::closeSession()
 {
 	usersCollection.saveAllUserToFile(usersFilename.c_str());
 	tasksCollection.saveAllTasksToFile(tasksFilename.c_str());
+	collaborationsCollection.saveAllCollaborationsToFile(collaborationsFilename.c_str());
 }

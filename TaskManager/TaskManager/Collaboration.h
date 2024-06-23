@@ -2,6 +2,7 @@
 #include "UsersCollection.h";
 #include "TasksCollection.h";
 #include "CollaborationTask.h";
+#include <fstream>
 
 class Collaboration
 {
@@ -17,12 +18,16 @@ public:
 	bool isUserPartOfCollaboration(const User& user) const;
 	bool isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
 
-	void addCollaborationTask(CollaborationTask* task);
+	void addCollaborationTask(const SharedPtr<Task>& task);
 
 	void removeTasksForUsers(UsersCollection& users);
 
-	void addUser(const User& user);
+	void addUser(User user);
 	void printTasks() const;
+
+	const UsersCollection& getWorkingUsers() const;
+
+	void saveToFile(std::ofstream& os);
 private:
 	unsigned id;
 	MyString name;

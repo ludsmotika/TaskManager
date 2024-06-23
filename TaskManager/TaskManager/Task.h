@@ -14,7 +14,7 @@ public:
 
 	virtual ~Task() = default;
 
-	virtual Task* clone()  const;
+	virtual Task* clone() const;
 
 	virtual void print() const;
 	unsigned getId() const;

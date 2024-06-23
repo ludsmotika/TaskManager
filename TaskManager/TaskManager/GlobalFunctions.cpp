@@ -74,15 +74,10 @@ bool isValidDate(const MyString& date) {
 
 void printTime(time_t rawTime)
 {
-	struct tm* localTime = localtime(&rawTime);
-
-	if (localTime == nullptr) {
-		std::cerr << "Failed to convert time." << std::endl;
-		return;
-	}
-
+	tm* localTime = localtime(&rawTime);
 	char buffer[80];
-	strftime(buffer, sizeof(buffer), "%Y-%m-%d", localTime);
+	strftime(buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Y", localTime);
+
 	std::cout << buffer;
 }
 

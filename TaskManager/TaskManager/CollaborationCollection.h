@@ -15,7 +15,7 @@ public:
 
 	~CollaborationCollection();
 
-	void readCollaborationsFromFile(const char* filename);
+	void readCollaborationsFromFile(const char* filename,UsersCollection& usersCollection, TasksCollection& tasks);
 
 	void addCollaboration(Collaboration* collaboration);
 	void addCollaboration(const Collaboration& collaboration);
@@ -41,6 +41,4 @@ private:
 	void copyFrom(const CollaborationCollection& other);
 	void moveFrom(CollaborationCollection&& other);
 	void resize();
-
-	void saveCollaborationToFile(std::ofstream& os, const Collaboration& task);
 };

@@ -3,10 +3,10 @@
 #include "CollaborationCollection.h"
 #include "Dashboard.h"
 
-//TODO: think about the dashBoard and where the logic for it should be
 class Session 
 {
 public:
+    static unsigned id;
     static Session& getInstance();
 
     void init(const char* usersFilename, const char* tasksFilename, const char* collaborationsFilename);

@@ -1,6 +1,7 @@
 #pragma once
 #include "User.h"
 #include "Optional.hpp"
+#include <fstream>
 
 class CollaborationTask : public Task 
 {

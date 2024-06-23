@@ -1,6 +1,9 @@
 #include "TasksCollection.h"
 #include "GlobalFunctions.h"
+#include "CollaborationTask.h"
 #include <fstream>
+#include <iostream>
+#include <typeinfo>
 #pragma warning (disable : 4996)
 
 TasksCollection::TasksCollection()
@@ -84,14 +87,24 @@ void TasksCollection::readTasksFromFile(const char* filename)
 		char* description = new char[taskDescriptionLength];
 		is.read(description, sizeof(char) * taskDescriptionLength);
 
-		if (is.eof()) break;
+		bool isItACollabTask = false;
+		is.read((char*)&isItACollabTask, sizeof(bool));
 
 		MyString parsedTaskName(taskName);
 		MyString parsedTaskDescription(description);
 
-		if (isThereADueDate)
+		if (is.eof()) break;
+
+		if (isItACollabTask)
 		{
-			
+			size_t collabTaskAssigneeLength;
+			is.read((char*)&collabTaskAssigneeLength, sizeof(size_t));
+
+			char* assigneeName = new char[collabTaskAssigneeLength];
+			is.read(assigneeName, sizeof(char) * collabTaskAssigneeLength);
+
+			MyString parsedAssigneeName(assigneeName);
+
 			time_t now = time(nullptr);
 			tm* localTime = localtime(&now);
 			localTime->tm_hour = 0;
@@ -102,7 +115,23 @@ void TasksCollection::readTasksFromFile(const char* filename)
 			if (dueDate < currentTime)
 				status = TaskStatus::OVERDUE;
 
-			addTask(new Task(id, parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength)));
+			addTask(new CollaborationTask(id,parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength), parsedAssigneeName.substr(0, collabTaskAssigneeLength)));
+
+		}
+		else if(isThereADueDate)
+		{
+
+			time_t now = time(nullptr);
+			tm* localTime = localtime(&now);
+			localTime->tm_hour = 0;
+			localTime->tm_min = 0;
+			localTime->tm_sec = 0;
+			time_t currentTime = mktime(localTime);
+
+			if (dueDate < currentTime)
+				status = TaskStatus::OVERDUE;
+
+			addTask(new Task(id,parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength)));
 		}
 		else
 		{
@@ -136,9 +165,6 @@ SharedPtr<Task> TasksCollection::operator[] (unsigned index)
 
 void TasksCollection::free()
 {
-	//TODO think about how to delete the tasks collection
-	/*for (size_t i = 0; i < tasksCount; i++)
-		delete &tasks[i];*/
 	delete[] tasks;
 }
 
@@ -201,7 +227,7 @@ void TasksCollection::saveAllTasksToFile(const char* filename)
 		saveTaskToFile(os, *tasks[i]);
 }
 
-void TasksCollection::addTask(Task* task)
+void TasksCollection::addTask(const SharedPtr<Task>& task)
 {
 	if (tasksCount == capacity)
 		resize();
@@ -210,16 +236,13 @@ void TasksCollection::addTask(Task* task)
 
 void TasksCollection::removeTaskByIndex(unsigned index)
 {
-	if (index >= 0 && index < tasksCount) 
-	{
-		std::swap(tasks[index], tasks[tasksCount-1]);
-		tasks[tasksCount-1].~SharedPtr();
-	}
+	if (index >= 0 && index < tasksCount)
+		std::swap(tasks[index], tasks[tasksCount - 1]);
 
 	tasksCount--;
 }
 
-unsigned TasksCollection::getMaxTaskId() const 
+unsigned TasksCollection::getMaxTaskId() const
 {
 	unsigned biggestId = 0;
 
@@ -231,7 +254,7 @@ unsigned TasksCollection::getMaxTaskId() const
 	return biggestId;
 }
 
-void TasksCollection::saveTaskToFile(std::ofstream& os, const Task& task)
+void TasksCollection::saveTaskToFile(std::ofstream& os, Task& task)
 {
 	unsigned taskId = task.getId();
 	os.write((const char*)&taskId, sizeof(unsigned));
@@ -261,4 +284,21 @@ void TasksCollection::saveTaskToFile(std::ofstream& os, const Task& task)
 	size_t taskDescriptionLength = task.getDescription().getSize();
 	os.write((const char*)&taskDescriptionLength, sizeof(size_t));
 	os.write(task.getDescription().c_str(), sizeof(char) * task.getDescription().getSize());
+
+
+	bool isItCollabTask = false;
+	if (CollaborationTask* collabTask = dynamic_cast<CollaborationTask*>(&task))
+	{
+		isItCollabTask = true;
+		os.write((const char*)&isItCollabTask, sizeof(bool));
+
+		size_t collabTaskAssigneeLength = collabTask->getAssignee().getSize();
+		os.write((const char*)&collabTaskAssigneeLength, sizeof(size_t));
+		os.write(collabTask->getAssignee().c_str(), sizeof(char) * collabTaskAssigneeLength);
+	}
+	else
+	{
+		os.write((const char*)&isItCollabTask, sizeof(bool));
+	}
+
 }

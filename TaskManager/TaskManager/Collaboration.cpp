@@ -16,6 +16,43 @@ bool Collaboration::isCreatorOfCollaboration(const User& user) const
 	return false;
 }
 
+void Collaboration::saveToFile(std::ofstream& os) 
+{
+	unsigned collaborationId = getId();
+	os.write((const char*)&collaborationId, sizeof(unsigned));
+
+	size_t collaborationNameLength = getName().getSize();
+	os.write((const char*)&collaborationNameLength, sizeof(size_t));
+	os.write(getName().c_str(), sizeof(char) * getName().getSize());
+
+	size_t collaborationCreatorNameLength = getCreatorName().getSize();
+	os.write((const char*)&collaborationCreatorNameLength, sizeof(size_t));
+	os.write(getCreatorName().c_str(), sizeof(char) * collaborationCreatorNameLength);
+
+	size_t workersCount = workingUsers.getUsersCount();
+	os.write((const char*)&workersCount, sizeof(size_t));
+
+	for (size_t i = 0; i < getWorkingUsers().getUsersCount(); i++)
+	{
+		size_t currentWorkingUserNameLen = workingUsers[i]->getUsername().getSize();
+		os.write((const char*)&currentWorkingUserNameLen, sizeof(size_t));
+		os.write(workingUsers[i]->getUsername().c_str(), sizeof(char) * currentWorkingUserNameLen);
+	}
+
+	size_t tasksCount = tasks.getTasksCount();
+	os.write((const char*)&tasksCount, sizeof(size_t));
+
+	for (size_t i = 0; i < tasks.getTasksCount(); i++)
+	{
+		unsigned currentTaskId = tasks[i]->getId();
+		os.write((const char*)&currentTaskId, sizeof(unsigned));
+
+		/*size_t assigneeNameLen = ((CollaborationTask*)tasks[i].operator->())->getAssignee().getSize();
+		os.write((const char*)&assigneeNameLen, sizeof(size_t));
+		os.write(((CollaborationTask*)tasks[i].operator->())->getAssignee().c_str(), sizeof(char) * assigneeNameLen);*/
+	}
+}
+
 bool Collaboration::isUserPartOfCollaboration(const User& user) const
 {
 	for (size_t i = 0; i < workingUsers.getUsersCount(); i++)
@@ -26,7 +63,7 @@ bool Collaboration::isUserPartOfCollaboration(const User& user) const
 	return false;
 }
 
-void Collaboration::addUser(const User& user)
+void Collaboration::addUser(User user)
 {
 	bool isUserAlreadyInCollaboration = false;
 
@@ -62,7 +99,7 @@ void Collaboration::removeTasksForUsers(UsersCollection& users)
 	}
 }
 
-void Collaboration::addCollaborationTask(CollaborationTask* task)
+void Collaboration::addCollaborationTask(const SharedPtr<Task>& task)
 {
 	tasks.addTask(task);
 }
@@ -94,3 +131,9 @@ MyString Collaboration::getCreatorName() const
 {
 	return creator;
 }
+
+const UsersCollection& Collaboration::getWorkingUsers() const
+{
+	return workingUsers;
+}
+
