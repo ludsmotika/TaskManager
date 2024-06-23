@@ -22,8 +22,8 @@ void Session::init(const char* usersFilename, const char* tasksFilename, const c
 		this->tasksFilename = tasksFilename;
 		this->collaborationsFilename = collaborationsFilename;
 
-		tasksCollection.readTasksFromFile(tasksFilename);
-		usersCollection.readUsersFromFile(usersFilename, tasksCollection);
+//tasksCollection.readTasksFromFile(tasksFilename);
+	//usersCollection.readUsersFromFile(usersFilename, tasksCollection);
 		//load Collaborations
 		initialized = true;
 	}
@@ -305,7 +305,9 @@ void Session::deleteCollaboration(MyString collabName)
 			if (!collaborationsCollection[i]->isCreatorOfCollaboration(*usersCollection[currentUserIndex]))
 				throw std::invalid_argument("Only the creator of the collaboration can delete it!");
 
+			collaborationsCollection[i]->removeTasksForUsers(usersCollection);
 			collaborationsCollection.removeCollaborationByIndex(i);
+
 		}
 	}
 }
@@ -335,8 +337,11 @@ void Session::addUserToCollaborationByUsername(MyString collabName, MyString use
 		{
 			try
 			{
+				if (!collaborationsCollection.getCollaborationByName(collabName).isInitlized())
+					throw std::invalid_argument("There isn't a collaboration with this name!");
+
 				if (collaborationsCollection.getCollaborationByName(collabName)->isUserPartOfCollaboration(*usersCollection[i]))
-					throw std::invalid_argument("This user is already a part of the collaboration!");
+					throw std::invalid_argument("This user is already a part from the collaboration!");
 
 				collaborationsCollection.getCollaborationByName(collabName)->addUser(*usersCollection[i]);
 				std::cout << "User added successfully to " << collabName << "!" << std::endl;
@@ -347,11 +352,6 @@ void Session::addUserToCollaborationByUsername(MyString collabName, MyString use
 				std::cout << e.what() << std::endl;
 				return;
 			}
-			catch (const std::exception& e)
-			{
-				std::cout << "There isn't a collaboration with this name!" << std::endl;
-				return;
-			}
 		}
 	}
 
@@ -360,6 +360,9 @@ void Session::addUserToCollaborationByUsername(MyString collabName, MyString use
 
 void Session::listCollaboration(MyString collabName) const
 {
+	if (!collaborationsCollection.getCollaborationByName(collabName).isInitlized())
+		throw std::invalid_argument("There isn't a collaboration with this name!");
+
 	if (collaborationsCollection.getCollaborationByName(collabName)->isCreatorOfCollaboration(usersCollection[currentUserIndex])
 		|| collaborationsCollection.getCollaborationByName(collabName)->isUserPartOfCollaboration(usersCollection[currentUserIndex]))
 	{
@@ -373,6 +376,9 @@ void Session::listCollaboration(MyString collabName) const
 
 void Session::addCollaborationTask(MyString collabName, MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
 {
+	if(!collaborationsCollection.getCollaborationByName(collabName).isInitlized())
+		throw std::invalid_argument("There isn't a collaboration with this name!");
+
 	if (!collaborationsCollection.getCollaborationByName(collabName)->isCreatorOfCollaboration(*usersCollection[currentUserIndex]))
 		throw std::invalid_argument("You have to be the creator of the collaboration in order to assign tasks!");
 
@@ -382,8 +388,11 @@ void Session::addCollaborationTask(MyString collabName, MyString username, MyStr
 	if (collaborationsCollection.getCollaborationByName(collabName)->isTaskAlreadyInTheCollaboration(username, taskName, taskDueDate, taskDescription))
 		throw std::invalid_argument("This task is already assigned to the user!");
 
-	unsigned taskId = tasksCollection.getMaxTaskId() + 1;
-	CollaborationTask* task = new CollaborationTask(taskId,taskName,taskDueDate,TaskStatus::ON_HOLD,taskDescription,username);
+	unsigned id = 0;
+	if (tasksCollection.getTasksCount() != 0)
+		id = tasksCollection.getMaxTaskId() + 1;
+
+	CollaborationTask* task = new CollaborationTask(id,taskName,taskDueDate,TaskStatus::ON_HOLD,taskDescription,username);
 	tasksCollection.addTask(task);
 	collaborationsCollection.getCollaborationByName(collabName)->addCollaborationTask(task);
 	
@@ -391,12 +400,11 @@ void Session::addCollaborationTask(MyString collabName, MyString username, MyStr
 	{
 		if (usersCollection[i]->getUsername() == username) 
 		{
-			usersCollection[i]->addTaskId(taskId);
+			usersCollection[i]->addTaskId(id);
 			break;
 		}
 	}
 }
-
 
 void Session::logout()
 {

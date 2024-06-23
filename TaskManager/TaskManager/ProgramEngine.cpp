@@ -574,12 +574,9 @@ void ProgramEngine::run(Session& session)
 					std::cout << "Unexpected error occured!" << std::endl;
 				}
 			}
-
-
 		}
 		else if (currentCommand == "assign-task")
 		{
-			//assign-task <collaboration name> <username> <name> <due_date> <description>
 			if (!session.isThereALoggedInUser())
 			{
 				std::cout << "Login or register in order to assign tasks!" << std::endl;

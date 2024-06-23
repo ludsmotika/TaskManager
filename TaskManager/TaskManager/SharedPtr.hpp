@@ -73,9 +73,9 @@ void SharedPtr<T>::free()
 
 	counter->removeSharedPtr();
 
-	if (counter->useCount == 0)
+	if (counter->useCount == 0) 
 		delete data;
-
+	
 	if (counter->weakCount == 0)
 		delete counter;
 }

@@ -86,7 +86,7 @@ SharedPtr<Collaboration> CollaborationCollection::getCollaborationByName(MyStrin
 			return collaborations[i];
 	}
 
-	return nullptr;
+	return SharedPtr<Collaboration>();
 }
 
 

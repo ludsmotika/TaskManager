@@ -225,7 +225,7 @@ unsigned TasksCollection::getMaxTaskId() const
 
 	for (size_t i = 0; i < tasksCount; i++)
 	{
-		if (tasks[i]->getId() > biggestId)
+		if (tasks[i].isInitlized() && tasks[i]->getId() > biggestId)
 			biggestId = tasks[i]->getId();
 	}
 	return biggestId;

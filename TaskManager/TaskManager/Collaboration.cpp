@@ -40,13 +40,26 @@ void Collaboration::addUser(const User& user)
 		workingUsers.addUser(user);
 }
 
-void Collaboration::printTasks() const 
+void Collaboration::printTasks() const
 {
 	if (tasks.getTasksCount() == 0)
 		throw std::invalid_argument("There aren't any tasks in this collaboration!");
 
 	for (size_t i = 0; i < tasks.getTasksCount(); i++)
-		tasks[i].print() ;
+		tasks[i].print();
+}
+
+void Collaboration::removeTasksForUsers(UsersCollection& users)
+{
+	for (size_t i = 0; i < tasks.getTasksCount(); i++)
+	{
+		for (size_t j = 0; j < users.getUsersCount(); j++)
+		{
+			if (((CollaborationTask*)tasks[i].operator->())->getAssignee() == users[j]->getUsername())
+				users[j]->removeTaskId(tasks[i]->getId());
+		}
+
+	}
 }
 
 void Collaboration::addCollaborationTask(CollaborationTask* task)
@@ -54,7 +67,7 @@ void Collaboration::addCollaborationTask(CollaborationTask* task)
 	tasks.addTask(task);
 }
 
-bool Collaboration::isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription) 
+bool Collaboration::isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
 {
 	for (size_t i = 0; i < tasks.getTasksCount(); i++)
 	{

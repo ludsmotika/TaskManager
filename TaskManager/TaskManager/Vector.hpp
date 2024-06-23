@@ -42,7 +42,9 @@ private:
 template<typename T>
 Vector<T>::Vector()
 {
-	elements = new T[3];
+	elements = new T[4];
+	elementsCount = 0;
+	capacity = 4;
 }
 
 template<typename T>
@@ -225,7 +227,7 @@ bool Vector<T>::empty() const
 template<typename T>
 size_t Vector<T>::size() const
 {
-	return elementsCount;
+	return this->elementsCount;
 }
 
 template<typename T>

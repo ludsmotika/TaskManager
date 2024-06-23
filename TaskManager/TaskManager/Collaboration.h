@@ -19,6 +19,8 @@ public:
 
 	void addCollaborationTask(CollaborationTask* task);
 
+	void removeTasksForUsers(UsersCollection& users);
+
 	void addUser(const User& user);
 	void printTasks() const;
 private:

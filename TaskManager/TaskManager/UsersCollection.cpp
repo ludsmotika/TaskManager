@@ -9,7 +9,6 @@
 
 UsersCollection::UsersCollection()
 {
-	//fill the collection
 }
 
 void UsersCollection::readUsersFromFile(const char* filename, TasksCollection& tasks)

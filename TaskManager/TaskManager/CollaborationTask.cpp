@@ -30,6 +30,7 @@ void CollaborationTask::print() const
 	}
 	std::cout << "Status: " << getStatus() << std::endl;
 	std::cout << "Task desc: " << getDescription() << std::endl;
+	std::cout << "Assignee: " << getAssignee() << std::endl;
 	std::cout << std::endl;
 }
 
