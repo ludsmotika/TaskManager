@@ -396,7 +396,6 @@ void Session::addCollaborationTask(MyString collabName, MyString username, MyStr
 	if (collaborationsCollection.getCollaborationByName(collabName)->isTaskAlreadyInTheCollaboration(username, taskName, taskDueDate, taskDescription))
 		throw std::invalid_argument("This task is already assigned to the user!");
 
-	//SharedPtr<Task>* task= new SharedPtr<Task>(new CollaborationTask(id, taskName, taskDueDate, TaskStatus::ON_HOLD, taskDescription, username));
 	tasksCollection.addTask(CollaborationTask(id, taskName, taskDueDate, TaskStatus::ON_HOLD, taskDescription, username));
 	collaborationsCollection.getCollaborationByName(collabName)->addCollaborationTask(tasksCollection.getTaskById(id));
 

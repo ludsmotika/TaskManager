@@ -122,9 +122,9 @@ void User::initDashboard(const TasksCollection& tasksCollection)
 			if (currentTaskYear == year && currentTaskMonth == month && currentTaskDay == day)
 			{
 				bool isTaskAlreadyInTheDashboard = false;
-				for (size_t i = 0; i < dashboard.getTasksCount(); i++)
+				for (size_t j = 0; j < dashboard.getTasksCount(); j++)
 				{
-					if (tasksCollection.getTaskById(tasksIds[i])->getId() == tasksIds[i])
+					if (dashboard[j].lock()->getId() == tasksIds[i])
 					{
 						isTaskAlreadyInTheDashboard = true;
 						break;

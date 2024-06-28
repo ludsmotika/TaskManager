@@ -239,6 +239,7 @@ void TasksCollection::removeTaskByIndex(unsigned index)
 	if (index >= 0 && index < tasksCount)
 		std::swap(tasks[index], tasks[tasksCount - 1]);
 
+	tasks[tasksCount-1] = nullptr;
 	tasksCount--;
 }
 
