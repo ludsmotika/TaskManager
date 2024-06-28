@@ -77,8 +77,8 @@ void CollaborationCollection::readCollaborationsFromFile(const char* filename, U
 		MyString parsedCollabName(collabName);
 		MyString parsedCreatorName(creatorName);
 
-		Collaboration* collab = new Collaboration(id, parsedCollabName.substr(0,collabNameLength), parsedCreatorName.substr(0, creatorNameLength));
-		
+		Collaboration* collab = new Collaboration(id, parsedCollabName.substr(0, collabNameLength), parsedCreatorName.substr(0, creatorNameLength));
+
 		size_t workersCount;
 		is.read((char*)&workersCount, sizeof(size_t));
 
@@ -104,7 +104,7 @@ void CollaborationCollection::readCollaborationsFromFile(const char* filename, U
 			unsigned currentTaskId;
 			is.read((char*)&currentTaskId, sizeof(unsigned));
 
-			collab->addCollaborationTask(tasksCollection.getTaskById(currentTaskId));
+			collab->addCollaborationTaskById(currentTaskId);
 		}
 
 		addCollaboration(collab);

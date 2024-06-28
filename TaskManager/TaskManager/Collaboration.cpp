@@ -39,15 +39,12 @@ void Collaboration::saveToFile(std::ofstream& os)
 		os.write(workingUsers[i]->getUsername().c_str(), sizeof(char) * currentWorkingUserNameLen);
 	}
 
-	size_t tasksCount = tasks.getTasksCount();
+	size_t tasksCount = tasksIds.size();
 	os.write((const char*)&tasksCount, sizeof(size_t));
 
-	SharedPtr<Task> cruere = tasks[0];
-	SharedPtr<Task> cruer2e = tasks[1];
-
-	for (size_t i = 0; i < tasks.getTasksCount(); i++)
+	for (size_t i = 0; i < tasksIds.size(); i++)
 	{
-		unsigned currentTaskId = tasks[i]->getId();
+		unsigned currentTaskId = tasksIds[i];
 		os.write((const char*)&currentTaskId, sizeof(unsigned));
 
 		/*size_t assigneeNameLen = ((CollaborationTask*)tasks[i].operator->())->getAssignee().getSize();
@@ -80,43 +77,41 @@ void Collaboration::addUser(User user)
 		workingUsers.addUser(user);
 }
 
-void Collaboration::printTasks() const
+void Collaboration::printTasks(const TasksCollection& tasks) const
 {
-	if (tasks.getTasksCount() == 0)
+	if (tasksIds.size() == 0)
 		throw std::invalid_argument("There aren't any tasks in this collaboration!");
 
-	for (size_t i = 0; i < tasks.getTasksCount(); i++)
-		tasks[i].print();
+	for (size_t i = 0; i < tasksIds.size(); i++)
+	{
+		if (tasks.getTaskById(tasksIds[i]).isInitlized())
+			tasks.getTaskById(tasksIds[i])->print();
+	}
 }
 
-void Collaboration::removeTasksForUsers(UsersCollection& users)
+void Collaboration::removeTasksForUsers(const TasksCollection& tasks, UsersCollection& users)
 {
-	for (size_t i = 0; i < tasks.getTasksCount(); i++)
+	for (size_t i = 0; i < tasksIds.size(); i++)
 	{
 		for (size_t j = 0; j < users.getUsersCount(); j++)
 		{
-			if (((CollaborationTask*)tasks[i].operator->())->getAssignee() == users[j]->getUsername())
-				users[j]->removeTaskId(tasks[i]->getId());
+			if (((CollaborationTask*)&tasks[tasksIds[i]])->getAssignee() == users[j]->getUsername())
+				users[j]->removeTaskId(tasks[i].getId());
 		}
 
 	}
 }
 
-void Collaboration::addCollaborationTask(const SharedPtr<Task>& task)
+void Collaboration::addCollaborationTaskById(unsigned taskId)
 {
-	tasks.addTask(task);
+	tasksIds.push_back(taskId);
 }
 
-void Collaboration::addCollaborationTask(const Task& task)
+bool Collaboration::isTaskAlreadyInTheCollaboration(const TasksCollection& tasks, MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
 {
-	tasks.addTask(task);
-}
-
-bool Collaboration::isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
-{
-	for (size_t i = 0; i < tasks.getTasksCount(); i++)
+	for (size_t i = 0; i < tasksIds.size(); i++)
 	{
-		SharedPtr<CollaborationTask> currentTask = (CollaborationTask*)(tasks[i].operator->());
+		CollaborationTask* currentTask = (CollaborationTask*)(&tasks[tasksIds[i]]);
 		if (currentTask->getAssignee() == username && currentTask->getName() == taskName && currentTask->getDueDate() == taskDueDate && currentTask->getDescription() == taskDescription)
 			return true;
 	}

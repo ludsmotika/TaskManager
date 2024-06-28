@@ -16,15 +16,14 @@ public:
 
 	bool isCreatorOfCollaboration(const User& user) const;
 	bool isUserPartOfCollaboration(const User& user) const;
-	bool isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
+	bool isTaskAlreadyInTheCollaboration(const TasksCollection& tasks, MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
 
-	void addCollaborationTask(const SharedPtr<Task>& task);
-	void addCollaborationTask(const Task& task);
+	void addCollaborationTaskById(unsigned id);
 
-	void removeTasksForUsers(UsersCollection& users);
+	void removeTasksForUsers(const TasksCollection& tasks,UsersCollection& users);
 
 	void addUser(User user);
-	void printTasks() const;
+	void printTasks(const TasksCollection& tasks) const;
 
 	const UsersCollection& getWorkingUsers() const;
 
@@ -36,5 +35,5 @@ private:
 
 	UsersCollection workingUsers;
 
-	TasksCollection tasks;
+	Vector<unsigned> tasksIds;
 };
