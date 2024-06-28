@@ -16,7 +16,7 @@ bool Collaboration::isCreatorOfCollaboration(const User& user) const
 	return false;
 }
 
-void Collaboration::saveToFile(std::ofstream& os) 
+void Collaboration::saveToFile(std::ofstream& os)
 {
 	unsigned collaborationId = getId();
 	os.write((const char*)&collaborationId, sizeof(unsigned));
@@ -41,6 +41,9 @@ void Collaboration::saveToFile(std::ofstream& os)
 
 	size_t tasksCount = tasks.getTasksCount();
 	os.write((const char*)&tasksCount, sizeof(size_t));
+
+	SharedPtr<Task> cruere = tasks[0];
+	SharedPtr<Task> cruer2e = tasks[1];
 
 	for (size_t i = 0; i < tasks.getTasksCount(); i++)
 	{
@@ -100,6 +103,11 @@ void Collaboration::removeTasksForUsers(UsersCollection& users)
 }
 
 void Collaboration::addCollaborationTask(const SharedPtr<Task>& task)
+{
+	tasks.addTask(task);
+}
+
+void Collaboration::addCollaborationTask(const Task& task)
 {
 	tasks.addTask(task);
 }

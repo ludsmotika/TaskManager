@@ -19,6 +19,7 @@ public:
 	bool isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
 
 	void addCollaborationTask(const SharedPtr<Task>& task);
+	void addCollaborationTask(const Task& task);
 
 	void removeTasksForUsers(UsersCollection& users);
 
@@ -32,6 +33,7 @@ private:
 	unsigned id;
 	MyString name;
 	MyString creator;
+
 	UsersCollection workingUsers;
 
 	TasksCollection tasks;

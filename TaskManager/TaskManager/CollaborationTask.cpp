@@ -36,7 +36,7 @@ void CollaborationTask::print() const
 
 Task* CollaborationTask::clone() const 
 {
-	Task* newObj = new  (std::nothrow)CollaborationTask(*this);
+	Task* newObj = new (std::nothrow)CollaborationTask(*this);
 	return newObj;
 }
 
