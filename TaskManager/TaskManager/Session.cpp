@@ -305,7 +305,7 @@ void Session::deleteCollaboration(MyString collabName)
 			if (!collaborationsCollection[i]->isCreatorOfCollaboration(*usersCollection[currentUserIndex]))
 				throw std::invalid_argument("Only the creator of the collaboration can delete it!");
 
-			collaborationsCollection[i]->removeTasksForUsers(tasksCollection, usersCollection);
+			collaborationsCollection[i]->removeTasksForUsers(usersCollection);
 			collaborationsCollection.removeCollaborationByIndex(i);
 		}
 	}
@@ -365,7 +365,7 @@ void Session::listCollaboration(MyString collabName) const
 	if (collaborationsCollection.getCollaborationByName(collabName)->isCreatorOfCollaboration(usersCollection[currentUserIndex])
 		|| collaborationsCollection.getCollaborationByName(collabName)->isUserPartOfCollaboration(usersCollection[currentUserIndex]))
 	{
-		collaborationsCollection.getCollaborationByName(collabName)->printTasks(tasksCollection);
+		collaborationsCollection.getCollaborationByName(collabName)->printTasks();
 	}
 	else
 	{
@@ -384,12 +384,18 @@ void Session::addCollaborationTask(MyString collabName, MyString username, MyStr
 	if (!collaborationsCollection.getCollaborationByName(collabName)->isUserPartOfCollaboration(usersCollection.getUserByUsername(username)))
 		throw std::invalid_argument("You can only assign tasks to users which are in the collaboration!");
 
-	if (collaborationsCollection.getCollaborationByName(collabName)->isTaskAlreadyInTheCollaboration(tasksCollection,username, taskName, taskDueDate, taskDescription))
+	if (collaborationsCollection.getCollaborationByName(collabName)->isTaskAlreadyInTheCollaboration(username, taskName, taskDueDate, taskDescription))
 		throw std::invalid_argument("This task is already assigned to the user!");
 
+<<<<<<< HEAD
 	SharedPtr<Task> task(new CollaborationTask(id, taskName, taskDueDate, TaskStatus::ON_HOLD, taskDescription, username));
 	tasksCollection.addTask(task);
 	collaborationsCollection.getCollaborationByName(collabName)->addCollaborationTask(task);
+=======
+	SharedPtr<Task>* task= new SharedPtr<Task>(new CollaborationTask(id, taskName, taskDueDate, TaskStatus::ON_HOLD, taskDescription, username));
+	tasksCollection.addTask(*task);
+	collaborationsCollection.getCollaborationByName(collabName)->addCollaborationTask(*task);
+>>>>>>> parent of a65ba37 (refactoring to work with ids)
 
 	for (size_t i = 0; i < usersCollection.getUsersCount(); i++)
 	{

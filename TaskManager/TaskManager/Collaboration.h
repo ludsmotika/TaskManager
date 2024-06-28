@@ -16,14 +16,18 @@ public:
 
 	bool isCreatorOfCollaboration(const User& user) const;
 	bool isUserPartOfCollaboration(const User& user) const;
-	bool isTaskAlreadyInTheCollaboration(const TasksCollection& tasks, MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
+	bool isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
 
 	void addCollaborationTask(const SharedPtr<Task>& task);
+<<<<<<< HEAD
+=======
+	void addCollaborationTask(const Task& task);
+>>>>>>> parent of a65ba37 (refactoring to work with ids)
 
-	void removeTasksForUsers(const TasksCollection& tasks,UsersCollection& users);
+	void removeTasksForUsers(UsersCollection& users);
 
 	void addUser(User user);
-	void printTasks(const TasksCollection& tasks) const;
+	void printTasks() const;
 
 	const UsersCollection& getWorkingUsers() const;
 
@@ -34,5 +38,5 @@ private:
 	MyString creator;
 	UsersCollection workingUsers;
 
-	Vector<unsigned> tasksIds;
+	TasksCollection tasks;
 };
