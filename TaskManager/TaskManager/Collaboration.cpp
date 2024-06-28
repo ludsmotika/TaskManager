@@ -16,7 +16,7 @@ bool Collaboration::isCreatorOfCollaboration(const User& user) const
 	return false;
 }
 
-void Collaboration::saveToFile(std::ofstream& os) 
+void Collaboration::saveToFile(std::ofstream& os)
 {
 	unsigned collaborationId = getId();
 	os.write((const char*)&collaborationId, sizeof(unsigned));
@@ -42,12 +42,9 @@ void Collaboration::saveToFile(std::ofstream& os)
 	size_t tasksCount = tasks.getTasksCount();
 	os.write((const char*)&tasksCount, sizeof(size_t));
 
-<<<<<<< HEAD
-=======
 	SharedPtr<Task> cruere = tasks[0];
 	SharedPtr<Task> cruer2e = tasks[1];
 
->>>>>>> parent of a65ba37 (refactoring to work with ids)
 	for (size_t i = 0; i < tasks.getTasksCount(); i++)
 	{
 		unsigned currentTaskId = tasks[i]->getId();
@@ -105,16 +102,12 @@ void Collaboration::removeTasksForUsers(UsersCollection& users)
 	}
 }
 
-<<<<<<< HEAD
-bool Collaboration::isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
-=======
 void Collaboration::addCollaborationTask(const SharedPtr<Task>& task)
 {
 	tasks.addTask(task);
 }
 
 void Collaboration::addCollaborationTask(const Task& task)
->>>>>>> parent of a65ba37 (refactoring to work with ids)
 {
 	tasks.addTask(task);
 }
@@ -123,7 +116,7 @@ bool Collaboration::isTaskAlreadyInTheCollaboration(MyString username, MyString 
 {
 	for (size_t i = 0; i < tasks.getTasksCount(); i++)
 	{
-		SharedPtr<CollaborationTask> currentTask = (CollaborationTask*)(tasks[i].operator->());
+		CollaborationTask* currentTask = (CollaborationTask*)(tasks[i].operator->());
 		if (currentTask->getAssignee() == username && currentTask->getName() == taskName && currentTask->getDueDate() == taskDueDate && currentTask->getDescription() == taskDescription)
 			return true;
 	}

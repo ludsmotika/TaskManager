@@ -19,10 +19,7 @@ public:
 	bool isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription);
 
 	void addCollaborationTask(const SharedPtr<Task>& task);
-<<<<<<< HEAD
-=======
 	void addCollaborationTask(const Task& task);
->>>>>>> parent of a65ba37 (refactoring to work with ids)
 
 	void removeTasksForUsers(UsersCollection& users);
 
@@ -36,6 +33,7 @@ private:
 	unsigned id;
 	MyString name;
 	MyString creator;
+
 	UsersCollection workingUsers;
 
 	TasksCollection tasks;
