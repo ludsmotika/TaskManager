@@ -23,16 +23,9 @@ void Session::init(const char* usersFilename, const char* tasksFilename, const c
 		this->tasksFilename = tasksFilename;
 		this->collaborationsFilename = collaborationsFilename;
 
-		try
-		{
-			tasksCollection.readTasksFromFile(tasksFilename);
-			usersCollection.readUsersFromFile(usersFilename, tasksCollection);
-			collaborationsCollection.readCollaborationsFromFile(collaborationsFilename, usersCollection, tasksCollection);
-		}
-		catch (const std::exception&)
-		{
-
-		}
+		tasksCollection.readTasksFromFile(tasksFilename);
+		usersCollection.readUsersFromFile(usersFilename, tasksCollection);
+		collaborationsCollection.readCollaborationsFromFile(collaborationsFilename, usersCollection, tasksCollection);
 		initialized = true;
 	}
 }
@@ -82,6 +75,7 @@ void Session::addTask(MyString name, time_t dueDate, MyString description)
 		if (tasksCollection.getTaskById(tasksIds[i])->getName() == name && tasksCollection.getTaskById(tasksIds[i])->getDueDate() == dueDate)
 			throw std::invalid_argument("This task already exists!");
 	}
+
 
 	tasksCollection.addTask(Task(id, name, dueDate, TaskStatus::ON_HOLD, description));
 	usersCollection[currentUserIndex]->addTaskId(id);
@@ -167,10 +161,7 @@ void Session::listAllTasks() const
 {
 	Vector<unsigned> tasksIds = usersCollection[currentUserIndex].getTasksIds();
 	for (size_t i = 0; i < tasksIds.size(); i++)
-	{
-		if (tasksCollection.getTaskById(tasksIds[i]).isInitlized())
-			tasksCollection.getTaskById(tasksIds[i])->print();
-	}
+		tasksCollection.getTaskById(tasksIds[i])->print();
 
 	if (tasksIds.size() == 0)
 		std::cout << "You still didn't add any tasks!" << std::endl;
@@ -396,9 +387,9 @@ void Session::addCollaborationTask(MyString collabName, MyString username, MyStr
 	if (collaborationsCollection.getCollaborationByName(collabName)->isTaskAlreadyInTheCollaboration(tasksCollection,username, taskName, taskDueDate, taskDescription))
 		throw std::invalid_argument("This task is already assigned to the user!");
 
-	SharedPtr<Task>* task = new SharedPtr<Task>(new CollaborationTask(id, taskName, taskDueDate, TaskStatus::ON_HOLD, taskDescription, username));
-    tasksCollection.addTask(*task);
-	collaborationsCollection.getCollaborationByName(collabName)->addCollaborationTaskById(id);
+	SharedPtr<Task> task(new CollaborationTask(id, taskName, taskDueDate, TaskStatus::ON_HOLD, taskDescription, username));
+	tasksCollection.addTask(task);
+	collaborationsCollection.getCollaborationByName(collabName)->addCollaborationTask(task);
 
 	for (size_t i = 0; i < usersCollection.getUsersCount(); i++)
 	{

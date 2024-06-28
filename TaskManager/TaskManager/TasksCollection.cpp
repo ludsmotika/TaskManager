@@ -1,7 +1,6 @@
 #include "TasksCollection.h"
 #include "GlobalFunctions.h"
 #include "CollaborationTask.h"
-#include "Session.h"
 #include <fstream>
 #include <iostream>
 #include <typeinfo>
@@ -62,11 +61,8 @@ void TasksCollection::readTasksFromFile(const char* filename)
 
 	while (true)
 	{
-		unsigned currentId;
-		is.read((char*)&currentId, sizeof(unsigned));
-
-		if (currentId >= Session::id)
-			Session::id = currentId + 1;
+		unsigned id;
+		is.read((char*)&id, sizeof(unsigned));
 
 		size_t taskNameLength;
 		is.read((char*)&taskNameLength, sizeof(size_t));
@@ -119,10 +115,10 @@ void TasksCollection::readTasksFromFile(const char* filename)
 			if (dueDate < currentTime)
 				status = TaskStatus::OVERDUE;
 
-			addTask(new CollaborationTask(currentId, parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength), parsedAssigneeName.substr(0, collabTaskAssigneeLength)));
+			addTask(new CollaborationTask(id,parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength), parsedAssigneeName.substr(0, collabTaskAssigneeLength)));
 
 		}
-		else if (isThereADueDate)
+		else if(isThereADueDate)
 		{
 
 			time_t now = time(nullptr);
@@ -135,11 +131,11 @@ void TasksCollection::readTasksFromFile(const char* filename)
 			if (dueDate < currentTime)
 				status = TaskStatus::OVERDUE;
 
-			addTask(new Task(currentId, parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength)));
+			addTask(new Task(id,parsedTaskName.substr(0, taskNameLength), dueDate, status, parsedTaskDescription.substr(0, taskDescriptionLength)));
 		}
 		else
 		{
-			addTask(new Task(currentId, parsedTaskName.substr(0, taskNameLength), status, parsedTaskDescription.substr(0, taskDescriptionLength)));
+			addTask(new Task(id, parsedTaskName.substr(0, taskNameLength), status, parsedTaskDescription.substr(0, taskDescriptionLength)));
 		}
 
 		delete[] taskName;
@@ -243,7 +239,6 @@ void TasksCollection::removeTaskByIndex(unsigned index)
 	if (index >= 0 && index < tasksCount)
 		std::swap(tasks[index], tasks[tasksCount - 1]);
 
-	tasks[tasksCount - 1] = nullptr;
 	tasksCount--;
 }
 

@@ -112,9 +112,6 @@ void User::initDashboard(const TasksCollection& tasksCollection)
 	{
 		try
 		{
-			if (!tasksCollection.getTaskById(tasksIds[i]).isInitlized())
-				continue;
-
 			time_t dueDate = tasksCollection.getTaskById(tasksIds[i])->getDueDate();
 			tm* localTime2 = localtime(&dueDate);
 

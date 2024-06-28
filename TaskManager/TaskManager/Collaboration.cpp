@@ -16,7 +16,7 @@ bool Collaboration::isCreatorOfCollaboration(const User& user) const
 	return false;
 }
 
-void Collaboration::saveToFile(std::ofstream& os)
+void Collaboration::saveToFile(std::ofstream& os) 
 {
 	unsigned collaborationId = getId();
 	os.write((const char*)&collaborationId, sizeof(unsigned));
@@ -42,7 +42,7 @@ void Collaboration::saveToFile(std::ofstream& os)
 	size_t tasksCount = tasksIds.size();
 	os.write((const char*)&tasksCount, sizeof(size_t));
 
-	for (size_t i = 0; i < tasksIds.size(); i++)
+	for (size_t i = 0; i < tasks.getTasksCount(); i++)
 	{
 		unsigned currentTaskId = tasksIds[i];
 		os.write((const char*)&currentTaskId, sizeof(unsigned));
@@ -102,12 +102,7 @@ void Collaboration::removeTasksForUsers(const TasksCollection& tasks, UsersColle
 	}
 }
 
-void Collaboration::addCollaborationTaskById(unsigned taskId)
-{
-	tasksIds.push_back(taskId);
-}
-
-bool Collaboration::isTaskAlreadyInTheCollaboration(const TasksCollection& tasks, MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
+bool Collaboration::isTaskAlreadyInTheCollaboration(MyString username, MyString taskName, time_t taskDueDate, MyString taskDescription)
 {
 	for (size_t i = 0; i < tasksIds.size(); i++)
 	{
