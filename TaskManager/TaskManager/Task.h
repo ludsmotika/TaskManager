@@ -8,7 +8,6 @@ class Task
 {
 public:
 
-	//TODO: does the task has to create the id or it should be passed to the constructor
 	Task(unsigned id, MyString name, time_t dueDate, TaskStatus status, MyString description);
 	Task(unsigned id, MyString name, TaskStatus status, MyString description);
 
